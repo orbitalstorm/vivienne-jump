@@ -1,0 +1,31 @@
+name: vivienne_jump
+description: "VIVIENNE : L'Odyssée Blossom v1.0.0 — Jeu d'ascension verticale Haute Couture (Doodle Jump clone) en mode Portrait propulsé par l'asset Blender 3D vivienne_speedy_v03.blend dans l'univers Louis Vuitton."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/sprites/app_icon_512.png
+    - assets/sprites/lv_eye_flower_mask.png
+    - assets/sprites/lv_monogram_tile.png
+    - assets/sprites/vivienne_pose_1_squash.png
+    - assets/sprites/vivienne_pose_2_launch.png
+    - assets/sprites/vivienne_pose_3_apex.png
+    - assets/sprites/vivienne_pose_4_landing.png
+    - assets/sprites/vivienne_pose_5_grand_apex.png
+    - assets/sprites/vivienne_pose_6_rig.png
