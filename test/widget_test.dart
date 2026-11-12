@@ -66,7 +66,7 @@ Future<void> _capturePortraitScreenshot(
   GlobalKey boundaryKey,
   String outputPath,
 ) async {
-  await tester.pump(const Duration(milliseconds: 32));
+  await tester.pump(const Duration(milliseconds: 260));
   final RenderRepaintBoundary boundary =
       boundaryKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
   final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
@@ -106,6 +106,38 @@ void main() {
       expect(f60.jumpIndex, equals(2));
       expect(f60.recommendedPose, equals(VivienneBlenderPose.pose5GrandApex));
       expect(f60.armRaise, greaterThan(0.95));
+    },
+  );
+
+  test(
+    '5 Platform archetypes expose distinct multipliers, single-use shatter, and Seed Leaderboard API',
+    () {
+      expect(LvPlatformType.monogramTrunk.impulseMultiplier, closeTo(1.00, 1e-6));
+      expect(LvPlatformType.springLockGold.impulseMultiplier, closeTo(1.45, 1e-6));
+      expect(LvPlatformType.damierCloud.impulseMultiplier, closeTo(0.85, 1e-6));
+      expect(LvPlatformType.vachettaStrapMoving.impulseMultiplier, closeTo(1.14, 1e-6));
+      expect(LvPlatformType.silkBlossomFragile.singleUse, isTrue);
+      expect(LvPlatformType.silkBlossomFragile.impulseMultiplier, closeTo(1.06, 1e-6));
+
+      final VivienneJumpEngine engine = VivienneJumpEngine(seed: 777);
+      expect(engine.bestEntriesBySeed.length, greaterThanOrEqualTo(5));
+      expect(engine.bestScoreForSeed(777), equals(3840));
+
+      // Verify recording a new highscore on Seed #42 updates Seed Highscore & Leaderboard
+      engine.recordRunScore(
+        customSeed: 42,
+        customScore: 5120,
+        customAltitudeMeters: 410,
+      );
+      expect(engine.bestScoreForSeed(42), equals(5120));
+      expect(engine.bestAltitudeForSeed(42), equals(410));
+      expect(engine.lastRunBeatSeedRecord, isTrue);
+
+      // Verify replaySeed resets run on the targeted seed
+      engine.replaySeed(1854);
+      expect(engine.seed, equals(1854));
+      expect(engine.isInMenu, isFalse);
+      expect(engine.isGameOver, isFalse);
     },
   );
 
@@ -213,7 +245,7 @@ void main() {
   );
 
   testWidgets(
-    'Portrait 1080x2400 minimalist UI, natural parallax landscape & 6 high-res screenshots generation',
+    'Portrait 1080x2400 Store UI, Seed Leaderboard (Menu & Game Over), Replay Seed & 6 high-res screenshots',
     (WidgetTester tester) async {
       await tester.binding.setSurfaceSize(const Size(360, 800));
       addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -240,8 +272,71 @@ void main() {
       expect(find.textContaining('VIVIENNE'), findsWidgets);
       expect(find.textContaining('INCLINAISON'), findsOneWidget);
       expect(find.textContaining('SEED 777'), findsOneWidget);
+      expect(find.text('SCORES'), findsOneWidget);
 
-      // Screenshot 1: Clairière Ensoleillée (Sun, Clouds, Mountains, Hills, Trees Parallax)
+      // 1. Verify Store Menu & Seed Leaderboard before starting a run
+      await tester.tap(find.byKey(const Key('open_menu_leaderboard_button')));
+      await tester.pump(const Duration(milliseconds: 120));
+      expect(find.byKey(const Key('main_menu_overlay')), findsOneWidget);
+      expect(
+        find.textContaining('TABLEAU DES SCORES PAR SEED'),
+        findsOneWidget,
+      );
+      expect(find.text('REJOUER CE SEED'), findsWidgets);
+
+      await tester.runAsync(
+        () => _capturePortraitScreenshot(
+          tester,
+          repaintKey,
+          'screenshots/07_menu_store_leaderboard_seeds.png',
+        ),
+      );
+
+      // Tap "REJOUER CE SEED" on Seed #42 from the Menu Leaderboard
+      final Finder replaySeed42InMenu = find.byKey(
+        const Key('menu_replay_seed_42'),
+      );
+      await tester.ensureVisible(replaySeed42InMenu);
+      await tester.pump(const Duration(milliseconds: 80));
+      await tester.tap(replaySeed42InMenu);
+      await tester.pump(const Duration(milliseconds: 120));
+      expect(engine.isInMenu, isFalse);
+      expect(engine.seed, equals(42));
+
+      // 2. Verify Game Over Seed Leaderboard & "REJOUER CE SEED" action
+      engine.score = 4150;
+      engine.altitudeMeters = 335;
+      engine.recordRunScore();
+      engine.isGameOver = true;
+      engine.notifyListeners();
+      await tester.pump(const Duration(milliseconds: 120));
+
+      expect(find.byKey(const Key('game_over_overlay')), findsOneWidget);
+      expect(find.text('FIN D\'ASCENSION'), findsOneWidget);
+      expect(
+        find.textContaining('TABLEAU DES SCORES PAR SEED'),
+        findsOneWidget,
+      );
+
+      await tester.runAsync(
+        () => _capturePortraitScreenshot(
+          tester,
+          repaintKey,
+          'screenshots/08_game_over_leaderboard_rejouer_seed.png',
+        ),
+      );
+
+      final Finder replaySeed777OnGameOver = find.byKey(
+        const Key('gameover_replay_seed_777'),
+      );
+      await tester.ensureVisible(replaySeed777OnGameOver);
+      await tester.pump(const Duration(milliseconds: 80));
+      await tester.tap(replaySeed777OnGameOver);
+      await tester.pump(const Duration(milliseconds: 120));
+      expect(engine.isGameOver, isFalse);
+      expect(engine.seed, equals(777));
+
+      // Screenshot 1: Clairière Ensoleillée (5 Differentiated Platforms, Parallax & HUD)
       for (int i = 0; i < 16; i++) {
         engine.update(1 / 60);
       }
@@ -290,7 +385,7 @@ void main() {
 
       // Screenshot 4: Maison LV — Seed Selector, 4 Éditions de Vivienne & 4 Paysages Naturels
       await tester.tap(find.text('MAISON LV'));
-      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 80));
       expect(
         find.textContaining('4 ÉDITIONS VIVIENNE'),
         findsOneWidget,
@@ -303,9 +398,9 @@ void main() {
         ),
       );
 
-      // Screenshot 5: Herbier Blossom & Architectures de Plateformes
+      // Screenshot 5: Herbier Blossom & 5 Architectures de Plateformes Différenciées
       await tester.tap(find.text('HERBIER'));
-      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 80));
       expect(
         find.textContaining('HERBIER BLOSSOM'),
         findsOneWidget,
@@ -320,7 +415,7 @@ void main() {
 
       // Screenshot 6: Atelier Blender 3D (vivienne_speedy_v03.blend) & Rig 22 Os
       await tester.tap(find.text('BLENDER 3D'));
-      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 80));
       expect(
         find.textContaining('vivienne_speedy_v03.blend'),
         findsWidgets,

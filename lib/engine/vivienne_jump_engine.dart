@@ -16,12 +16,12 @@ class VivienneJumpEngine extends ChangeNotifier {
 
   static const double gravity = 1520.0;
   static const double baseJumpVelocity = -790.0;
-  static const double springJumpVelocity = -1122.0; // 790 * 1.42
+  static const double springJumpVelocity = -1145.5; // 790 * 1.45
   static const double speedyBoostVelocity = -1420.0;
   static const double maxFallVelocity = 980.0;
   static const double maxHorizontalSpeed = 520.0;
 
-  /// Official curated deterministic seeds selectable in the minimalist UI.
+  /// Official curated deterministic seeds selectable in the UI & Leaderboard.
   static const List<int> curatedSeeds = <int>[
     20261112,
     777,
@@ -43,6 +43,7 @@ class VivienneJumpEngine extends ChangeNotifier {
   int _nextEntityId = 1;
   int _generatedStepCount = 0;
   int _stepsSinceLastSpring = 10;
+  int _stepsSinceLastDamped = 10;
   LvPlatform? _lastGeneratedPlatform;
 
   // Player & Edition State
@@ -57,13 +58,152 @@ class VivienneJumpEngine extends ChangeNotifier {
   double cameraY = 0.0;
   double highestWorldY = worldHeight * 0.72;
   double altitudeMeters = 0.0;
-  double bestAltitudeMeters = 0.0;
+  double bestAltitudeMeters = 312.0;
   int score = 0;
-  int bestScore = 0;
+  int bestScore = 3840;
   int totalBlossomsCollected = 0;
   int runBlossomsCollected = 0;
   int comboCount = 1;
   double comboTimer = 0.0;
+  int perfectBounceStreak = 0;
+  int totalPerfectBouncesInRun = 0;
+  LvPlatformType lastBouncedPlatformType = LvPlatformType.monogramTrunk;
+
+  // Seeded Leaderboard & Per-Seed Highscores ("Tableau des Scores par Seed")
+  final Map<int, int> _seedHighScores = <int, int>{
+    777: 3840,
+    20261112: 3420,
+    1854: 2950,
+    42: 2480,
+    90210: 2190,
+  };
+
+  final Map<int, int> _seedBestAltitudes = <int, int>{
+    777: 312,
+    20261112: 278,
+    1854: 245,
+    42: 204,
+    90210: 182,
+  };
+
+  final List<SeedScoreEntry> _leaderboard = <SeedScoreEntry>[
+    const SeedScoreEntry(
+      seed: 777,
+      score: 3840,
+      altitudeMeters: 312,
+      blossomsCollected: 28,
+      edition: VivienneEdition.malleImperialeOr,
+      playerTag: 'Maison LV • Record #777',
+    ),
+    const SeedScoreEntry(
+      seed: 20261112,
+      score: 3420,
+      altitudeMeters: 278,
+      blossomsCollected: 24,
+      edition: VivienneEdition.speedyMonogramV03,
+      playerTag: 'Atelier Asnières',
+    ),
+    const SeedScoreEntry(
+      seed: 1854,
+      score: 2950,
+      altitudeMeters: 245,
+      blossomsCollected: 21,
+      edition: VivienneEdition.nuitAsnieres,
+      playerTag: 'Vendôme Or',
+    ),
+    const SeedScoreEntry(
+      seed: 42,
+      score: 2480,
+      altitudeMeters: 204,
+      blossomsCollected: 18,
+      edition: VivienneEdition.neoBlossomRose,
+      playerTag: 'Jardin Sakura',
+    ),
+    const SeedScoreEntry(
+      seed: 90210,
+      score: 2190,
+      altitudeMeters: 182,
+      blossomsCollected: 15,
+      edition: VivienneEdition.speedyMonogramV03,
+      playerTag: 'Étoile Blossom',
+    ),
+  ];
+
+  bool lastRunBeatSeedRecord = false;
+  bool _currentRunRecorded = false;
+
+  /// Returns all recorded score entries sorted by highest score first.
+  List<SeedScoreEntry> get leaderboardEntries {
+    final List<SeedScoreEntry> copy = List<SeedScoreEntry>.of(_leaderboard);
+    copy.sort((SeedScoreEntry a, SeedScoreEntry b) => b.score.compareTo(a.score));
+    return copy;
+  }
+
+  /// Returns the Highscore table with one best entry per Seed (sorted by highest score).
+  List<SeedScoreEntry> get bestEntriesBySeed {
+    final Map<int, SeedScoreEntry> bestPerSeed = <int, SeedScoreEntry>{};
+    for (final SeedScoreEntry entry in _leaderboard) {
+      final SeedScoreEntry? existing = bestPerSeed[entry.seed];
+      if (existing == null || entry.score > existing.score) {
+        bestPerSeed[entry.seed] = entry;
+      }
+    }
+    final List<SeedScoreEntry> list = bestPerSeed.values.toList();
+    list.sort((SeedScoreEntry a, SeedScoreEntry b) => b.score.compareTo(a.score));
+    return list;
+  }
+
+  /// Returns the current Highscore to beat for `targetSeed`.
+  int bestScoreForSeed(int targetSeed) => _seedHighScores[targetSeed] ?? 0;
+
+  /// Returns the best altitude (in meters) recorded on `targetSeed`.
+  int bestAltitudeForSeed(int targetSeed) => _seedBestAltitudes[targetSeed] ?? 0;
+
+  /// Highscore of the currently active seed.
+  int get currentSeedHighScore => bestScoreForSeed(_seed);
+
+  /// Records a completed or manual score entry into the Seed Leaderboard and updates Seed Highscores.
+  void recordRunScore({
+    int? customScore,
+    int? customAltitudeMeters,
+    int? customSeed,
+    String playerTag = 'VOUS • Vivienne',
+  }) {
+    final int targetSeed = customSeed ?? _seed;
+    final int finalScore = customScore ?? score;
+    final int finalAlt = customAltitudeMeters ?? altitudeMeters.round();
+    if (finalScore <= 0) return;
+
+    final int prevBestForSeed = _seedHighScores[targetSeed] ?? 0;
+    if (finalScore >= prevBestForSeed) {
+      _seedHighScores[targetSeed] = finalScore;
+      lastRunBeatSeedRecord = finalScore > prevBestForSeed || prevBestForSeed == 0;
+    }
+    final int prevAltForSeed = _seedBestAltitudes[targetSeed] ?? 0;
+    if (finalAlt > prevAltForSeed) {
+      _seedBestAltitudes[targetSeed] = finalAlt;
+    }
+    if (finalScore > bestScore) {
+      bestScore = finalScore;
+    }
+    if (finalAlt > bestAltitudeMeters) {
+      bestAltitudeMeters = finalAlt.toDouble();
+    }
+
+    _leaderboard.add(
+      SeedScoreEntry(
+        seed: targetSeed,
+        score: finalScore,
+        altitudeMeters: finalAlt,
+        blossomsCollected: runBlossomsCollected,
+        edition: selectedEdition,
+        playerTag: playerTag,
+        isPlayerRun: true,
+      ),
+    );
+    _currentRunRecorded = true;
+    notifyListeners();
+  }
 
   // Collectible Breakdown for the current run
   final Map<BlossomItemType, int> collectedByType = <BlossomItemType, int>{
@@ -93,7 +233,8 @@ class VivienneJumpEngine extends ChangeNotifier {
   double elapsedTime = 0.0;
   int totalJumpsInRun = 0;
 
-  // Lifecycle State
+  // Lifecycle & Menu State
+  bool isInMenu = false;
   bool isPaused = false;
   bool isGameOver = false;
 
@@ -191,7 +332,36 @@ class VivienneJumpEngine extends ChangeNotifier {
 
   /// Sets a new deterministic world seed and restarts the ascent.
   void setSeed(int newSeed) {
+    if (score > 0 && !_currentRunRecorded) {
+      recordRunScore();
+    }
+    isInMenu = false;
     resetRun(seed: newSeed);
+  }
+
+  /// Launches or replays a specific deterministic seed from the Menu or Game Over Leaderboard
+  /// with the explicit goal of beating that seed's Highscore.
+  void replaySeed(int targetSeed) {
+    if (score > 0 && !_currentRunRecorded) {
+      recordRunScore();
+    }
+    isInMenu = false;
+    resetRun(seed: targetSeed);
+  }
+
+  /// Opens the pre-game / store launch menu overlay (with Seed Leaderboard).
+  void openMainMenu() {
+    if (score > 0 && !_currentRunRecorded) {
+      recordRunScore();
+    }
+    isInMenu = true;
+    notifyListeners();
+  }
+
+  /// Starts a fresh run from the main menu on `targetSeed` (or current `_seed`).
+  void startRunFromMenu({int? targetSeed}) {
+    isInMenu = false;
+    resetRun(seed: targetSeed ?? _seed);
   }
 
   /// Cycles to the next curated deterministic seed.
@@ -199,7 +369,7 @@ class VivienneJumpEngine extends ChangeNotifier {
     final int idx = curatedSeeds.indexOf(_seed);
     final int nextSeed =
         curatedSeeds[(idx + 1) % curatedSeeds.length];
-    resetRun(seed: nextSeed);
+    setSeed(nextSeed);
   }
 
   void togglePause() {
@@ -355,6 +525,7 @@ class VivienneJumpEngine extends ChangeNotifier {
     _nextEntityId = 1;
     _generatedStepCount = 0;
     _stepsSinceLastSpring = 10;
+    _stepsSinceLastDamped = 10;
     _lastGeneratedPlatform = null;
 
     platforms.clear();
@@ -379,6 +550,11 @@ class VivienneJumpEngine extends ChangeNotifier {
     runBlossomsCollected = 0;
     comboCount = 1;
     comboTimer = 0.0;
+    perfectBounceStreak = 0;
+    totalPerfectBouncesInRun = 0;
+    lastBouncedPlatformType = LvPlatformType.monogramTrunk;
+    lastRunBeatSeedRecord = false;
+    _currentRunRecorded = false;
 
     blossomGauge = 0.50;
     speedyBoostTimer = 0.0;
@@ -698,6 +874,9 @@ class VivienneJumpEngine extends ChangeNotifier {
         _spawnCelebrationBurst(playerX, playerY, 16);
       } else {
         isGameOver = true;
+        if (!_currentRunRecorded) {
+          recordRunScore();
+        }
       }
     }
 
@@ -708,6 +887,7 @@ class VivienneJumpEngine extends ChangeNotifier {
     plat.bounceCompress = 1.0;
     groundSquashTimer = 0.16;
     totalJumpsInRun++;
+    lastBouncedPlatformType = plat.type;
 
     final double impulse =
         baseJumpVelocity *
@@ -715,25 +895,100 @@ class VivienneJumpEngine extends ChangeNotifier {
         selectedEdition.jumpImpulseMultiplier;
     playerVy = impulse;
 
-    if (plat.type == LvPlatformType.springLockGold) {
-      plat.hasSpringTriggered = true;
-      grandLeapTimer = math.max(grandLeapTimer, 0.70);
-      score += (90 * comboCount * selectedEdition.scoreMultiplier).round();
+    // Perfect Center Bounce detection: landing within 24% of platform center
+    final bool isPerfectCenter =
+        (playerX - plat.x).abs() <= plat.width * 0.24;
+    if (isPerfectCenter) {
+      perfectBounceStreak = (perfectBounceStreak + 1).clamp(1, 15);
+      totalPerfectBouncesInRun++;
+      comboTimer = math.max(comboTimer, 3.2);
+      final int perfBonus =
+          (35 * perfectBounceStreak * selectedEdition.scoreMultiplier).round();
+      score += perfBonus;
+      if (score > bestScore) {
+        bestScore = score;
+      }
+      blossomGauge = (blossomGauge + 0.08).clamp(0.0, 1.0);
       callouts.add(
         FloatingCallout(
-          text: 'RESSORT ×1.42',
+          text: 'PARFAIT ×$perfectBounceStreak ! +$perfBonus',
           x: plat.x,
-          y: plat.y - 22.0,
-          color: const Color(0xFFFFD700),
+          y: plat.y - 36.0,
+          color: const Color(0xFFFFE082),
         ),
       );
-      _spawnCelebrationBurst(plat.x, plat.y, 14);
     } else {
-      _spawnCelebrationBurst(plat.x, plat.y, 5);
+      perfectBounceStreak = 0;
     }
 
-    if (plat.type.singleUse) {
-      plat.broken = true;
+    // Distinct, crystal-clear gameplay effects & visual feedback per platform type
+    switch (plat.type) {
+      case LvPlatformType.springLockGold:
+        plat.hasSpringTriggered = true;
+        grandLeapTimer = math.max(grandLeapTimer, 0.75);
+        score += (100 * comboCount * selectedEdition.scoreMultiplier).round();
+        if (score > bestScore) {
+          bestScore = score;
+        }
+        callouts.add(
+          FloatingCallout(
+            text: 'SUPER RESSORT ×1.45 !',
+            x: plat.x,
+            y: plat.y - 20.0,
+            color: const Color(0xFFFFD700),
+          ),
+        );
+        _spawnCelebrationBurst(plat.x, plat.y, 16);
+
+      case LvPlatformType.silkBlossomFragile:
+        plat.broken = true;
+        score += (40 * comboCount * selectedEdition.scoreMultiplier).round();
+        if (score > bestScore) {
+          bestScore = score;
+        }
+        callouts.add(
+          FloatingCallout(
+            text: 'ÉPHÉMÈRE 1× !',
+            x: plat.x,
+            y: plat.y - 20.0,
+            color: const Color(0xFFF48FB1),
+          ),
+        );
+        _spawnFragileShatterBurst(plat.x, plat.y, 14);
+
+      case LvPlatformType.damierCloud:
+        blossomGauge = (blossomGauge + 0.12).clamp(0.0, 1.0);
+        score += (30 * comboCount * selectedEdition.scoreMultiplier).round();
+        if (score > bestScore) {
+          bestScore = score;
+        }
+        callouts.add(
+          FloatingCallout(
+            text: 'SAUT AMORTI ×0.85 • ÉCLAT +12%',
+            x: plat.x,
+            y: plat.y - 20.0,
+            color: const Color(0xFF80D8FF),
+          ),
+        );
+        _spawnCelebrationBurst(plat.x, plat.y, 7);
+
+      case LvPlatformType.vachettaStrapMoving:
+        score += (45 * comboCount * selectedEdition.scoreMultiplier).round();
+        if (score > bestScore) {
+          bestScore = score;
+        }
+        callouts.add(
+          FloatingCallout(
+            text: 'RAIL MOBILE ×1.14',
+            x: plat.x,
+            y: plat.y - 20.0,
+            color: const Color(0xFFE3A17B),
+          ),
+        );
+        _spawnCelebrationBurst(plat.x, plat.y, 7);
+
+      case LvPlatformType.monogramTrunk:
+        _spawnCelebrationBurst(plat.x, plat.y, 5);
     }
   }
 
@@ -825,28 +1080,31 @@ class VivienneJumpEngine extends ChangeNotifier {
       final LvPlatform prev = _lastGeneratedPlatform!;
       final bool prevHasSpringBonus =
           prev.type == LvPlatformType.springLockGold || prev.hasBonusItem;
+      final bool prevIsDampedCloud =
+          prev.type == LvPlatformType.damierCloud && !prev.hasBonusItem;
 
-      // Vertical gap computation:
-      // - Normal jump reaches ~205.3 px (up to ~248 px on highest edition + cloud).
-      // - Spring jump (×1.42) reaches ~414 px (up to ~465 px on highest edition).
-      // By choosing:
-      // - Normal stepY in [124, 168] px (or [144, 170] px right after a spring step)
-      // - Spring stepY in [192, 232] px (when prev is a springLockGold/bonus platform)
-      // we guarantee:
-      // a) P_{i+1} is ALWAYS vertically reachable from P_i.
-      // b) Any 3 consecutive steps sum to >= 372 px (normal) or >= 480 px (after spring),
-      //    so P_{i+3} is NEVER within single-jump height! Thus at most 2 platforms above P_i
-      //    (<= 3 total in jump reach) can ever be reached.
+      // Vertical gap computation accounting for all 5 platform impulse multipliers:
+      // - Normal jump (`×1.00`) reaches ~205.3 px.
+      // - Damped Cloud jump (`×0.85`) reaches ~148.3 px -> stepY in [98, 118] px so P_{i+1} is 100% reachable!
+      // - Moving Strap (`×1.14`) reaches ~266.8 px.
+      // - Spring jump (`×1.45`) reaches ~431.6 px -> stepY in [196, 234] px.
       final double stepY;
       if (prevHasSpringBonus) {
-        stepY = 192.0 + _levelRng.nextDouble() * 40.0; // 192..232 px (requires bonus jump)
+        stepY = 196.0 + _levelRng.nextDouble() * 38.0; // 196..234 px (requires spring/bonus jump)
         _stepsSinceLastSpring = 0;
-      } else if (_stepsSinceLastSpring < 2) {
-        stepY = 145.0 + _levelRng.nextDouble() * 23.0; // 145..168 px
+        _stepsSinceLastDamped++;
+      } else if (prevIsDampedCloud) {
+        stepY = 98.0 + _levelRng.nextDouble() * 18.0; // 98..116 px (short hop after damped cloud)
+        _stepsSinceLastDamped = 0;
         _stepsSinceLastSpring++;
+      } else if (_stepsSinceLastSpring < 2 || _stepsSinceLastDamped < 2) {
+        stepY = 148.0 + _levelRng.nextDouble() * 20.0; // 148..168 px
+        _stepsSinceLastSpring++;
+        _stepsSinceLastDamped++;
       } else {
-        stepY = 124.0 + _levelRng.nextDouble() * 44.0; // 124..168 px
+        stepY = 132.0 + _levelRng.nextDouble() * 36.0; // 132..168 px
         _stepsSinceLastSpring++;
+        _stepsSinceLastDamped++;
       }
 
       _highestGeneratedPlatformY -= stepY;
@@ -856,7 +1114,8 @@ class VivienneJumpEngine extends ChangeNotifier {
       final LvPlatformType type = _pickPlatformTypeForAltitude(
         altAtY,
         prevType: prev.type,
-        allowSpring: _stepsSinceLastSpring >= 3,
+        allowSpring: _stepsSinceLastSpring >= 3 && _stepsSinceLastDamped >= 2,
+        allowDamped: _stepsSinceLastDamped >= 3 && _stepsSinceLastSpring >= 2,
       );
 
       // Trimmer platform widths for genuine mobile precision challenge
@@ -869,7 +1128,7 @@ class VivienneJumpEngine extends ChangeNotifier {
         LvPlatformType.damierCloud => 76.0 - altitudeShrink,
       };
 
-      final double patrolRadius = type.movesHorizontally ? 28.0 : 0.0;
+      final double patrolRadius = type.movesHorizontally ? 26.0 : 0.0;
       final double speed = type.movesHorizontally
           ? (48.0 + _levelRng.nextDouble() * 34.0) *
                 (_levelRng.nextBool() ? 1.0 : -1.0)
@@ -885,14 +1144,14 @@ class VivienneJumpEngine extends ChangeNotifier {
 
       // Conservative horizontal reach even accounting for moving platform patrol radii
       final double maxSafeHorizontal = math.min(
-        158.0,
-        255.0 * math.max(0.28, flightTime - 0.14),
+        prevIsDampedCloud ? 118.0 : 156.0,
+        245.0 * math.max(0.26, flightTime - 0.14),
       );
       final double maxAnchorDelta = math.max(
-        58.0,
+        52.0,
         maxSafeHorizontal - prev.patrolRadius - patrolRadius,
       );
-      final double minAnchorDelta = math.min(44.0, maxAnchorDelta - 12.0);
+      final double minAnchorDelta = math.min(40.0, maxAnchorDelta - 10.0);
       final double deltaX =
           minAnchorDelta +
           _levelRng.nextDouble() * (maxAnchorDelta - minAnchorDelta);
@@ -965,28 +1224,32 @@ class VivienneJumpEngine extends ChangeNotifier {
     double altMeters, {
     required LvPlatformType prevType,
     required bool allowSpring,
+    required bool allowDamped,
   }) {
     final double r = _levelRng.nextDouble();
-    if (allowSpring && r < 0.15) {
+    if (allowSpring && r < 0.16) {
       return LvPlatformType.springLockGold;
     }
     if (altMeters < 600) {
       if (r < 0.32) return LvPlatformType.vachettaStrapMoving;
-      if (r < 0.44) return LvPlatformType.damierCloud;
+      if (r < 0.44 && prevType != LvPlatformType.silkBlossomFragile) {
+        return LvPlatformType.silkBlossomFragile;
+      }
+      if (allowDamped && r < 0.56) return LvPlatformType.damierCloud;
       return LvPlatformType.monogramTrunk;
     } else if (altMeters < 2500) {
-      if (r < 0.38) return LvPlatformType.vachettaStrapMoving;
+      if (r < 0.36) return LvPlatformType.vachettaStrapMoving;
       if (r < 0.54 && prevType != LvPlatformType.silkBlossomFragile) {
         return LvPlatformType.silkBlossomFragile;
       }
-      if (r < 0.68) return LvPlatformType.damierCloud;
+      if (allowDamped && r < 0.68) return LvPlatformType.damierCloud;
       return LvPlatformType.monogramTrunk;
     } else {
-      if (r < 0.42) return LvPlatformType.vachettaStrapMoving;
+      if (r < 0.40) return LvPlatformType.vachettaStrapMoving;
       if (r < 0.62 && prevType != LvPlatformType.silkBlossomFragile) {
         return LvPlatformType.silkBlossomFragile;
       }
-      if (r < 0.78) return LvPlatformType.damierCloud;
+      if (allowDamped && r < 0.78) return LvPlatformType.damierCloud;
       return LvPlatformType.monogramTrunk;
     }
   }
@@ -999,6 +1262,33 @@ class VivienneJumpEngine extends ChangeNotifier {
     if (r < 0.94) return BlossomItemType.monogramMagnet;
     if (r < 0.98) return BlossomItemType.goldenPadlockShield;
     return BlossomItemType.speedyBagBoost;
+  }
+
+  void _spawnFragileShatterBurst(double cx, double cy, int count) {
+    const List<Color> petalPalette = <Color>[
+      Color(0xFFF48FB1),
+      Color(0xFFF8BBD0),
+      Color(0xFFFFF0F5),
+      Color(0xFFFFD700),
+    ];
+    for (int i = 0; i < count; i++) {
+      final double angle = (i / count) * math.pi * 2.0 + _fxRng.nextDouble() * 0.35;
+      final double speed = 60.0 + _fxRng.nextDouble() * 140.0;
+      particles.add(
+        BlossomParticle(
+          x: cx + (_fxRng.nextDouble() - 0.5) * 36.0,
+          y: cy,
+          vx: math.cos(angle) * speed,
+          vy: math.sin(angle) * speed - 35.0,
+          size: 5.5 + _fxRng.nextDouble() * 4.5,
+          color: petalPalette[i % petalPalette.length],
+          life: 0.55 + _fxRng.nextDouble() * 0.30,
+          maxLife: 0.85,
+          isPetal: true,
+          rotation: _fxRng.nextDouble() * math.pi,
+        ),
+      );
+    }
   }
 
   void _spawnCelebrationBurst(double cx, double cy, int count) {

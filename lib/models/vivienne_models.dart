@@ -194,61 +194,106 @@ enum LvBiome {
   }
 }
 
-/// Platform types inspired by Louis Vuitton trunks, leather straps, and Blossom petals.
+/// Platform types inspired by Louis Vuitton trunks, leather straps, and Blossom petals,
+/// each with an immediately readable gameplay effect and visual badge.
 enum LvPlatformType {
   monogramTrunk(
     title: 'Malle Monogram Ébène',
-    description: 'Malle de voyage rigide à coins et rivets en laiton doré.',
+    badgeText: 'STABLE ×1.0',
+    shortEffectLabel: 'Appui Stable • Saut de référence (×1.00)',
+    description:
+        'Malle de voyage rigide à coins et rivets en laiton doré offrant un rebond franc et prévisible.',
     impulseMultiplier: 1.0,
     singleUse: false,
     movesHorizontally: false,
+    accentColor: Color(0xFFFFE082),
   ),
   vachettaStrapMoving(
     title: 'Lanière Cuir Vachetta Mobile',
+    badgeText: 'MOBILE ×1.14',
+    shortEffectLabel: 'Rail Mobile • Saut Tonique (+14 %) & Bonus +45 pts',
     description:
-        'Lanière en cuir beige rosé à tranche rouge carmin (#8B1E24) et surpiqûre jaune sellier oscillant autour de son point d\'ancrage.',
-    impulseMultiplier: 1.04,
+        'Lanière en cuir beige rosé à tranche rouge carmin (#8B1E24) patrouillant sur rail et offrant une impulsion tonique.',
+    impulseMultiplier: 1.14,
     singleUse: false,
     movesHorizontally: true,
+    accentColor: Color(0xFFE3A17B),
   ),
   silkBlossomFragile(
     title: 'Pétale de Soie Blossom Éphémère',
+    badgeText: '1 REBOND',
+    shortEffectLabel: 'Éphémère • Disparaît en pétales après 1 seul rebond',
     description:
-        'Plateforme délicate ivoire et rose qui s\'effeuille en pétales après un rebond.',
-    impulseMultiplier: 1.0,
+        'Plateforme délicate ivoire et rose à usage unique qui éclate en pétales immédiatement après votre rebond.',
+    impulseMultiplier: 1.06,
     singleUse: true,
     movesHorizontally: false,
+    accentColor: Color(0xFFF48FB1),
   ),
   springLockGold(
     title: 'Malle à Serrure Ressort Or 24K',
+    badgeText: 'SUPER ×1.45',
+    shortEffectLabel: 'Super Saut Plus Haut (+45 % vitesse • 2.1× hauteur)',
     description:
-        'Équipée d\'un fermoir à ressort doré propulsant Vivienne en Grand Saut (×1.42 vitesse verticale).',
-    impulseMultiplier: 1.42,
+        'Équipée d\'un double ressort doré 24K propulsant Vivienne très haut (×1.45 vitesse verticale) avec bonus de score.',
+    impulseMultiplier: 1.45,
     singleUse: false,
     movesHorizontally: false,
+    accentColor: Color(0xFFFFD700),
   ),
   damierCloud(
-    title: 'Nuage Damier Céleste',
+    title: 'Nuage Damier Amorti',
+    badgeText: 'AMORTI ×0.85',
+    shortEffectLabel: 'Saut Moins Haut (-15 % vitesse) • Recharge Éclat +12 %',
     description:
-        'Plateforme flottante nacrée qui oscille doucement et offre un rebond aérien.',
-    impulseMultiplier: 1.08,
+        'Nuage duveteux qui amortit l\'impact et réduit la hauteur du saut (×0.85), exigeant un saut court précis tout en chargeant la jauge Blossom.',
+    impulseMultiplier: 0.85,
     singleUse: false,
     movesHorizontally: true,
+    accentColor: Color(0xFF80D8FF),
   );
 
   const LvPlatformType({
     required this.title,
+    required this.badgeText,
+    required this.shortEffectLabel,
     required this.description,
     required this.impulseMultiplier,
     required this.singleUse,
     required this.movesHorizontally,
+    required this.accentColor,
   });
 
   final String title;
+  final String badgeText;
+  final String shortEffectLabel;
   final String description;
   final double impulseMultiplier;
   final bool singleUse;
   final bool movesHorizontally;
+  final Color accentColor;
+}
+
+/// Immutable score entry in the deterministic Seed Leaderboard ("Tableau des Scores par Seed").
+@immutable
+class SeedScoreEntry {
+  const SeedScoreEntry({
+    required this.seed,
+    required this.score,
+    required this.altitudeMeters,
+    required this.blossomsCollected,
+    required this.edition,
+    required this.playerTag,
+    this.isPlayerRun = false,
+  });
+
+  final int seed;
+  final int score;
+  final int altitudeMeters;
+  final int blossomsCollected;
+  final VivienneEdition edition;
+  final String playerTag;
+  final bool isPlayerRun;
 }
 
 /// Collectible items in the Louis Vuitton Blossom universe.

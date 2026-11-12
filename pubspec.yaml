@@ -1,8 +1,8 @@
 name: vivienne_jump
-description: "VIVIENNE : L'Odyssée Blossom v1.1.0 — Jeu d'ascension verticale Haute Couture (Doodle Jump clone) en mode Portrait propulsé par l'asset Blender 3D vivienne_speedy_v03.blend, parcours déterministe par Seed et paysages naturels en parallaxe."
+description: "VIVIENNE : L'Odyssée Blossom v1.2.0 — Jeu d'ascension verticale Haute Couture (Doodle Jump clone) en mode Portrait propulsé par l'asset Blender 3D vivienne_speedy_v03.blend, UI Store Mobile Pro, 5 plateformes différenciées et Tableau des Scores par Seed."
 publish_to: 'none'
 
-version: 1.1.0+2
+version: 1.2.0+3
 
 environment:
   sdk: ">=3.5.0 <4.0.0"

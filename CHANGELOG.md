@@ -1,5 +1,21 @@
 # Changelog — VIVIENNE : L'Odyssée Blossom
 
+## `v1.2.0` (2026-11-12) — Refonte UI Mobile Store Pro, 5 Plateformes à Effets Physiques Francs & Tableau des Scores par Seed (`ORB-52`, `ORB-53`)
+
+- **Analyse Game Design & 5 Archétypes de Plateformes à Effets Clairs (< 100 ms)** :
+  1. **Malle Monogram Ébène (`STABLE ×1.0` — Appui de Référence)** : Rebond franc (`~205 px`) avec mise en évidence dorée de la zone cible centrale de *Rebond Parfait* (`±24 %`).
+  2. **Malle à Serrure Ressort Or 24K (`SUPER ×1.45` — Saut Plus Haut)** : Propulse Vivienne **>2.1× plus haut** (`~432 px`) avec double ressort hélicoïdal doré animé, chevrons ascendants `▲▲`, pose *Grand Saut (Frame 60)*, callout `SUPER RESSORT ×1.45 !` et bonus `+100 × combo` pts.
+  3. **Nuage Damier Amorti (`AMORTI ×0.85` — Saut Moins Haut & Éclat +12 %)** : Nuage bleu glacier/nacre qui absorbe l'impact et réduit la hauteur du saut (`~148 px`), imposant un saut court et nerveux (écart suivant garanti atteignable à `98..116 px`) tout en rechargeant **+12 % de la jauge Éclat Blossom**.
+  4. **Pétale de Soie Blossom Éphémère (`1× REBOND` — Disparaît après 1 rebond)** : Pétale ivoire/carmin fissuré d'or (*Kintsugi*) qui offre une impulsion vive (`×1.06`) puis **éclate en 14 pétales de soie tourbillonnants dès le 1er rebond** (`singleUse: true`).
+  5. **Lanière Cuir Vachetta Mobile (`MOBILE ×1.14` — Rail Mobile)** : Patrouille horizontale sur rail pointillé avec flèches directionnelles, rebond tonique (`×1.14`, `~267 px`) et bonus `+45 × combo` pts.
+  - **Mécanique de *Rebond Parfait au Centre* (`PARFAIT ×N !`)** : Atterrir à `±24 %` du centre prolonge le combo, octroie `+35 × streak` pts et recharge `+8 %` de jauge Blossom.
+- **Tableau des Scores par Seed (`SeedScoreEntry`) & Rejouabilité Ciblée** :
+  - Intégration du **Tableau des Scores par Seed (`TABLEAU DES SCORES PAR SEED — HIGHSCORES`)** sur le **Menu d'Accueil Store (avant de lancer une partie)** et sur l'**Écran Game Over (après une partie)**.
+  - Affichage du Rang (`#1`, `#2`, `#3`...), du **Score (`pts`)**, de l'**Altitude (`m`)**, du **Seed (`SEED #...`)** et du **Highscore du Seed**.
+  - Bouton tactile 3D direct **« REJOUER CE SEED »** sur chaque ligne du classement (`replaySeed(seed)`) ainsi qu'une ligne horizontale dorée `RECORD SEED #...` peinte directement dans l'arène à l'altitude du record à battre.
+- **Refonte UI Mobile Store Pro & "Game Juice" (`mobile-game-ui` Mode B Flutter)** :
+  - Composants tactiles `Juicy3DGameButton` (*Squash & Stretch* `0.93` en `75 ms`, lèvre 3D inférieure dynamique, cibles `>= 48×48dp` en *Thumb Zone*), compteurs interpolés `InterpolatedHudTicker` isolés par `RepaintBoundary` et retours haptiques natifs (`HapticFeedback`).
+
 ## `v1.1.0` (2026-11-12) — Refonte Minimaliste, Challenge Déterministe par Seed & Paysage Naturel en Parallaxe (`ORB-49`)
 
 - **Interface Mobile Minimaliste, Épurée & Plein Écran** :

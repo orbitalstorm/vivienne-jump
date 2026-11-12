@@ -872,6 +872,67 @@ class VivienneGamePainter extends CustomPainter {
       )..layout();
       tp.paint(canvas, Offset(size.width - tp.width - 14.0, screenY - 13.0));
     }
+
+    // Horizontal Record Line for the active Seed ("RECORD SEED #...")
+    final int seedRecordAlt = engine.bestAltitudeForSeed(engine.seed);
+    if (seedRecordAlt > 0) {
+      final double recordWorldY =
+          VivienneJumpEngine.worldHeight * 0.72 - seedRecordAlt * 14.0;
+      final double recordScreenY = recordWorldY - engine.cameraY;
+      if (recordScreenY >= 56.0 && recordScreenY <= size.height - 70.0) {
+        final Paint glowPaint = Paint()
+          ..color = const Color(0x44FFD700)
+          ..strokeWidth = 5.0;
+        canvas.drawLine(
+          Offset(14.0, recordScreenY),
+          Offset(size.width - 14.0, recordScreenY),
+          glowPaint,
+        );
+
+        final Paint dashPaint = Paint()
+          ..color = const Color(0xFFFFD700)
+          ..strokeWidth = 1.5
+          ..strokeCap = StrokeCap.round;
+        for (double dx = 16.0; dx < size.width - 20.0; dx += 12.0) {
+          canvas.drawLine(
+            Offset(dx, recordScreenY),
+            Offset(math.min(dx + 6.5, size.width - 16.0), recordScreenY),
+            dashPaint,
+          );
+        }
+
+        final String recordLabel =
+            'RECORD SEED #${engine.seed} • $seedRecordAlt m (${engine.bestScoreForSeed(engine.seed)} pts)';
+        final TextPainter recordTp = TextPainter(
+          text: TextSpan(
+            text: recordLabel,
+            style: const TextStyle(
+              fontFamily: 'Roboto',
+              color: Color(0xFF0E1E16),
+              fontSize: 8.5,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 0.4,
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        )..layout();
+
+        final RRect badgeRRect = RRect.fromRectAndRadius(
+          Rect.fromLTWH(
+            16.0,
+            recordScreenY - 16.0,
+            recordTp.width + 12.0,
+            14.0,
+          ),
+          const Radius.circular(7),
+        );
+        canvas.drawRRect(
+          badgeRRect,
+          Paint()..color = const Color(0xEEFFD700),
+        );
+        recordTp.paint(canvas, Offset(22.0, recordScreenY - 14.0));
+      }
+    }
   }
 
   void _paintPlatforms(Canvas canvas) {
@@ -879,7 +940,7 @@ class VivienneGamePainter extends CustomPainter {
       if (plat.broken) continue;
       final double sy =
           plat.y - engine.cameraY + plat.bounceCompress * 5.0;
-      if (sy < -40.0 || sy > VivienneJumpEngine.worldHeight + 40.0) continue;
+      if (sy < -50.0 || sy > VivienneJumpEngine.worldHeight + 50.0) continue;
 
       final Rect rect = Rect.fromCenter(
         center: Offset(plat.x, sy),
@@ -888,15 +949,7 @@ class VivienneGamePainter extends CustomPainter {
       );
 
       if (plat.type.movesHorizontally && plat.patrolRadius > 0) {
-        final Paint trackPaint = Paint()
-          ..color = Colors.white.withValues(alpha: 0.22)
-          ..strokeWidth = 1.5
-          ..strokeCap = StrokeCap.round;
-        canvas.drawLine(
-          Offset(plat.anchorX - plat.patrolRadius, sy),
-          Offset(plat.anchorX + plat.patrolRadius, sy),
-          trackPaint,
-        );
+        _paintPatrolRail(canvas, plat, sy);
       }
 
       switch (plat.type) {
@@ -914,9 +967,56 @@ class VivienneGamePainter extends CustomPainter {
         case LvPlatformType.silkBlossomFragile:
           _paintSilkBlossomPlatform(canvas, rect);
         case LvPlatformType.damierCloud:
-          _paintDamierCloudPlatform(canvas, rect);
+          _paintDamierCloudPlatform(
+            canvas,
+            rect,
+            compress: plat.bounceCompress,
+          );
       }
     }
+  }
+
+  void _paintPatrolRail(Canvas canvas, LvPlatform plat, double sy) {
+    final double leftX = plat.anchorX - plat.patrolRadius - 12.0;
+    final double rightX = plat.anchorX + plat.patrolRadius + 12.0;
+    final Color railColor = plat.type == LvPlatformType.damierCloud
+        ? const Color(0xFF80D8FF)
+        : const Color(0xFFFFD700);
+
+    final Paint railGlow = Paint()
+      ..color = railColor.withValues(alpha: 0.20)
+      ..strokeWidth = 4.0
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(Offset(leftX, sy), Offset(rightX, sy), railGlow);
+
+    final Paint trackPaint = Paint()
+      ..color = railColor.withValues(alpha: 0.55)
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round;
+    for (double dx = leftX + 6.0; dx < rightX - 6.0; dx += 9.0) {
+      canvas.drawLine(
+        Offset(dx, sy),
+        Offset(math.min(dx + 4.5, rightX - 6.0), sy),
+        trackPaint,
+      );
+    }
+
+    // Directional patrol arrows ◄ and ► at rail bounds
+    final Paint arrowPaint = Paint()
+      ..color = railColor.withValues(alpha: 0.85)
+      ..style = PaintingStyle.fill;
+    final Path leftArrow = Path()
+      ..moveTo(leftX - 3.0, sy)
+      ..lineTo(leftX + 3.5, sy - 3.8)
+      ..lineTo(leftX + 3.5, sy + 3.8)
+      ..close();
+    final Path rightArrow = Path()
+      ..moveTo(rightX + 3.0, sy)
+      ..lineTo(rightX - 3.5, sy - 3.8)
+      ..lineTo(rightX - 3.5, sy + 3.8)
+      ..close();
+    canvas.drawPath(leftArrow, arrowPaint);
+    canvas.drawPath(rightArrow, arrowPaint);
   }
 
   void _paintMonogramTrunkPlatform(
@@ -927,8 +1027,8 @@ class VivienneGamePainter extends CustomPainter {
   }) {
     final RRect rrect = RRect.fromRectAndRadius(rect, const Radius.circular(8));
     canvas.drawRRect(
-      rrect.shift(const Offset(0, 3.5)),
-      Paint()..color = const Color(0x44000000),
+      rrect.shift(const Offset(0, 3.8)),
+      Paint()..color = const Color(0x52000000),
     );
     canvas.drawRRect(
       rrect,
@@ -936,15 +1036,17 @@ class VivienneGamePainter extends CustomPainter {
         ..shader = ui.Gradient.linear(
           rect.topLeft,
           rect.bottomLeft,
-          const <Color>[Color(0xFF4A3222), Color(0xFF2B1D14)],
+          hasSpring
+              ? const <Color>[Color(0xFF7B5318), Color(0xFF3E260A)]
+              : const <Color>[Color(0xFF4A3222), Color(0xFF2B1D14)],
         ),
     );
     canvas.drawRRect(
       rrect,
       Paint()
-        ..color = const Color(0xFFFFE082)
+        ..color = hasSpring ? const Color(0xFFFFD700) : const Color(0xFFFFE082)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.6,
+        ..strokeWidth = hasSpring ? 2.0 : 1.6,
     );
 
     final Paint brassFill = Paint()..color = const Color(0xFFFFD700);
@@ -963,27 +1065,102 @@ class VivienneGamePainter extends CustomPainter {
       brassFill,
     );
 
+    // Perfect Center Bounce target zone (±24% of platform width) on top edge
+    final double perfWidth = rect.width * 0.42;
+    final RRect perfZone = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(rect.center.dx, rect.top + 2.2),
+        width: perfWidth,
+        height: 3.2,
+      ),
+      const Radius.circular(2),
+    );
+    canvas.drawRRect(
+      perfZone,
+      Paint()..color = const Color(0xDDFFD700),
+    );
+
     if (hasSpring) {
-      final double springH = springExtended ? 16.0 : 9.0;
-      final Rect springRect = Rect.fromCenter(
-        center: Offset(rect.center.dx, rect.top - springH * 0.5),
-        width: 24.0,
-        height: springH,
-      );
+      // Double helical 24K gold spring + luminous upward chevrons ▲▲ + SUPER ×1.45 badge
+      final double springH = springExtended ? 18.0 : 10.5;
+      final double springTopY = rect.top - springH;
+
+      final Paint coilPaint = Paint()
+        ..color = const Color(0xFFFFD700)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0
+        ..strokeCap = StrokeCap.round;
+
+      for (final double coilOffsetX in <double>[-7.0, 7.0]) {
+        final double cx = rect.center.dx + coilOffsetX;
+        final Path coil = Path()
+          ..moveTo(cx - 4.0, rect.top)
+          ..lineTo(cx + 4.0, rect.top - springH * 0.33)
+          ..lineTo(cx - 4.0, rect.top - springH * 0.66)
+          ..lineTo(cx + 4.0, springTopY);
+        canvas.drawPath(coil, coilPaint);
+      }
+
+      // Golden spring launch pad
       canvas.drawRRect(
-        RRect.fromRectAndRadius(springRect, const Radius.circular(4)),
-        Paint()..color = const Color(0xFFFFD700),
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(
+            center: Offset(rect.center.dx, springTopY),
+            width: 32.0,
+            height: 5.0,
+          ),
+          const Radius.circular(2.5),
+        ),
+        Paint()..color = const Color(0xFFFFF59D),
       );
       canvas.drawRRect(
         RRect.fromRectAndRadius(
           Rect.fromCenter(
-            center: Offset(rect.center.dx, rect.top - springH),
-            width: 30.0,
-            height: 4.5,
+            center: Offset(rect.center.dx, springTopY),
+            width: 32.0,
+            height: 5.0,
           ),
           const Radius.circular(2.5),
         ),
-        Paint()..color = const Color(0xFFFFFFFF),
+        Paint()
+          ..color = const Color(0xFFFFA000)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.2,
+      );
+
+      // Animated floating upward chevrons ▲▲ above the spring
+      final double bob = math.sin(engine.elapsedTime * 7.5) * 2.2;
+      final Paint chevronPaint = Paint()
+        ..color = const Color(0xFFFFEA00)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.8
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round;
+      for (int c = 0; c < 2; c++) {
+        final double cy = springTopY - 6.0 - c * 4.8 + bob;
+        final Path chev = Path()
+          ..moveTo(rect.center.dx - 5.5, cy + 3.0)
+          ..lineTo(rect.center.dx, cy - 1.5)
+          ..lineTo(rect.center.dx + 5.5, cy + 3.0);
+        canvas.drawPath(chev, chevronPaint);
+      }
+
+      _drawPlatformMicroBadge(
+        canvas,
+        Offset(rect.center.dx, rect.bottom + 1.5),
+        'SUPER ×1.45',
+        bgColor: const Color(0xFFFFD700),
+        borderColor: const Color(0xFFFFFFFF),
+        textColor: const Color(0xFF1A1105),
+      );
+    } else {
+      _drawPlatformMicroBadge(
+        canvas,
+        Offset(rect.center.dx, rect.bottom + 1.0),
+        'STABLE ×1.0',
+        bgColor: const Color(0xDD2B1D14),
+        borderColor: const Color(0xFFFFE082),
+        textColor: const Color(0xFFFFE082),
       );
     }
   }
@@ -1011,11 +1188,44 @@ class VivienneGamePainter extends CustomPainter {
       Paint()
         ..color = const Color(0xFF8B1E24)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.6,
+        ..strokeWidth = 1.8,
     );
+
+    // Saddle stitches along top and bottom edges
+    final Paint stitchPaint = Paint()
+      ..color = const Color(0xFFFFE082)
+      ..strokeWidth = 1.1;
+    for (double sx = rect.left + 12.0; sx < rect.right - 12.0; sx += 7.0) {
+      canvas.drawLine(
+        Offset(sx, rect.top + 2.8),
+        Offset(sx + 3.2, rect.top + 2.8),
+        stitchPaint,
+      );
+    }
+
+    // Center golden saddle buckle & rivets
     final Paint goldDot = Paint()..color = const Color(0xFFFFD700);
     canvas.drawCircle(Offset(rect.left + 7.0, rect.center.dy), 3.0, goldDot);
     canvas.drawCircle(Offset(rect.right - 7.0, rect.center.dy), 3.0, goldDot);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromCenter(center: rect.center, width: 12.0, height: 9.0),
+        const Radius.circular(2.5),
+      ),
+      Paint()
+        ..color = const Color(0xFFFFD700)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.6,
+    );
+
+    _drawPlatformMicroBadge(
+      canvas,
+      Offset(rect.center.dx, rect.bottom + 1.2),
+      'MOBILE ×1.14',
+      bgColor: const Color(0xEE8B1E24),
+      borderColor: const Color(0xFFFFD700),
+      textColor: const Color(0xFFFFF59D),
+    );
   }
 
   void _paintSilkBlossomPlatform(Canvas canvas, Rect rect) {
@@ -1029,52 +1239,170 @@ class VivienneGamePainter extends CustomPainter {
     );
     canvas.drawRRect(
       rrect,
-      Paint()..color = const Color(0xEBFFF0F5),
-    );
-    canvas.drawRRect(
-      rrect,
-      Paint()
-        ..color = const Color(0xFFF06292)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5,
-    );
-    final Path crack = Path()
-      ..moveTo(rect.center.dx - 5, rect.top + 2)
-      ..lineTo(rect.center.dx + 2, rect.center.dy)
-      ..lineTo(rect.center.dx - 3, rect.bottom - 2);
-    canvas.drawPath(
-      crack,
-      Paint()
-        ..color = const Color(0xFFC2185B)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.3,
-    );
-  }
-
-  void _paintDamierCloudPlatform(Canvas canvas, Rect rect) {
-    final RRect rrect = RRect.fromRectAndRadius(
-      rect,
-      const Radius.circular(10),
-    );
-    canvas.drawRRect(
-      rrect.shift(const Offset(0, 3.5)),
-      Paint()..color = const Color(0x33000000),
-    );
-    canvas.drawRRect(
-      rrect,
       Paint()
         ..shader = ui.Gradient.linear(
           rect.topLeft,
           rect.bottomRight,
-          const <Color>[Color(0xFFFFFFFF), Color(0xFFE1F5FE)],
+          const <Color>[Color(0xFFFFF0F5), Color(0xFFF8BBD0)],
         ),
     );
+
+    // Dashed fragile border indicating single-use ephemeral platform
+    final Paint dashBorder = Paint()
+      ..color = const Color(0xFFD81B60)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.6;
+    canvas.drawRRect(rrect, dashBorder);
+
+    // Kintsugi gold & crimson cracks across the silk petal platform
+    final Path crackMain = Path()
+      ..moveTo(rect.center.dx - 12, rect.top + 2)
+      ..lineTo(rect.center.dx - 3, rect.center.dy)
+      ..lineTo(rect.center.dx + 6, rect.center.dy - 2)
+      ..lineTo(rect.center.dx + 12, rect.bottom - 2);
+    final Path crackBranch = Path()
+      ..moveTo(rect.center.dx - 3, rect.center.dy)
+      ..lineTo(rect.center.dx - 9, rect.bottom - 2);
+    canvas.drawPath(
+      crackMain,
+      Paint()
+        ..color = const Color(0xFFAD1457)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
+    canvas.drawPath(
+      crackBranch,
+      Paint()
+        ..color = const Color(0xFFFFD700)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.2,
+    );
+
+    _drawPlatformMicroBadge(
+      canvas,
+      Offset(rect.center.dx, rect.bottom + 1.2),
+      '1× REBOND',
+      bgColor: const Color(0xEEAD1457),
+      borderColor: const Color(0xFFFFF0F5),
+      textColor: const Color(0xFFFFFFFF),
+    );
+  }
+
+  void _paintDamierCloudPlatform(
+    Canvas canvas,
+    Rect rect, {
+    double compress = 0.0,
+  }) {
+    final double squashH = rect.height * (1.0 - compress * 0.25);
+    final double stretchW = rect.width * (1.0 + compress * 0.12);
+    final Rect cloudRect = Rect.fromCenter(
+      center: rect.center,
+      width: stretchW,
+      height: squashH,
+    );
+    final RRect rrect = RRect.fromRectAndRadius(
+      cloudRect,
+      const Radius.circular(11),
+    );
+    canvas.drawRRect(
+      rrect.shift(const Offset(0, 3.5)),
+      Paint()..color = const Color(0x33005B9F),
+    );
+
+    final Paint cloudFill = Paint()
+      ..shader = ui.Gradient.linear(
+        cloudRect.topLeft,
+        cloudRect.bottomRight,
+        const <Color>[Color(0xFFFFFFFF), Color(0xFFB3E5FC)],
+      );
+    canvas.drawRRect(rrect, cloudFill);
+
+    // Puffy cushioned cloud lobes along the top
+    for (final double lobeFactor in <double>[-0.26, 0.0, 0.26]) {
+      canvas.drawCircle(
+        Offset(
+          cloudRect.center.dx + cloudRect.width * lobeFactor,
+          cloudRect.top + 2.0,
+        ),
+        squashH * 0.45,
+        cloudFill,
+      );
+    }
+
     canvas.drawRRect(
       rrect,
       Paint()
-        ..color = const Color(0xFFFFD54F)
+        ..color = const Color(0xFF00B0FF)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.6,
+    );
+
+    // Downward damped-bounce chevron ▼ above/inside the cloud
+    final Path downArrow = Path()
+      ..moveTo(cloudRect.center.dx - 4.5, cloudRect.top - 5.0)
+      ..lineTo(cloudRect.center.dx + 4.5, cloudRect.top - 5.0)
+      ..lineTo(cloudRect.center.dx, cloudRect.top - 0.5)
+      ..close();
+    canvas.drawPath(
+      downArrow,
+      Paint()..color = const Color(0xFF00E5FF),
+    );
+
+    _drawPlatformMicroBadge(
+      canvas,
+      Offset(cloudRect.center.dx, cloudRect.bottom + 1.2),
+      'AMORTI ×0.85',
+      bgColor: const Color(0xEE01579B),
+      borderColor: const Color(0xFF80D8FF),
+      textColor: const Color(0xFFE1F5FE),
+    );
+  }
+
+  void _drawPlatformMicroBadge(
+    Canvas canvas,
+    Offset topCenter,
+    String text, {
+    required Color bgColor,
+    required Color borderColor,
+    required Color textColor,
+  }) {
+    final TextPainter tp = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(
+          fontFamily: 'Roboto',
+          color: textColor,
+          fontSize: 7.5,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 0.3,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    final Rect pillRect = Rect.fromCenter(
+      center: Offset(topCenter.dx, topCenter.dy + 4.0),
+      width: tp.width + 8.0,
+      height: tp.height + 2.5,
+    );
+    final RRect pillRRect = RRect.fromRectAndRadius(
+      pillRect,
+      const Radius.circular(5),
+    );
+    canvas.drawRRect(pillRRect, Paint()..color = bgColor);
+    canvas.drawRRect(
+      pillRRect,
+      Paint()
+        ..color = borderColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 0.9,
+    );
+    tp.paint(
+      canvas,
+      Offset(
+        pillRect.center.dx - tp.width * 0.5,
+        pillRect.center.dy - tp.height * 0.5,
+      ),
     );
   }
 

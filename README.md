@@ -1,29 +1,29 @@
-# VIVIENNE : L'Odyssée Blossom (`v1.1.0`) — Ascension Naturelle & Minimaliste en Mode Portrait
+# VIVIENNE : L'Odyssée Blossom (`v1.2.0`) — UI Mobile Store Pro, 5 Plateformes Différenciées & Leaderboard par Seed
 
-**VIVIENNE : L'Odyssée Blossom (`v1.1.0` — `cloud.orbital8.vivienne_jump`)** est un jeu Android d'ascension verticale (*Doodle Jump clone*) développé en Flutter, mettant en scène l'asset 3D Blender officiel **[`models/vivienne_speedy_v03.blend`](https://github.com/orbitalstorm/BLENDER_LAB/blob/main/models/vivienne_speedy_v03.blend)** au cœur d'un **paysage naturel en parallaxe** avec une **interface mobile minimaliste** et un **parcours déterministe par Seed**.
+**VIVIENNE : L'Odyssée Blossom (`v1.2.0` — `cloud.orbital8.vivienne_jump`)** est un jeu Android d'ascension verticale (*Doodle Jump clone*) développé en Flutter, mettant en scène l'asset 3D Blender officiel **[`models/vivienne_speedy_v03.blend`](https://github.com/orbitalstorm/BLENDER_LAB/blob/main/models/vivienne_speedy_v03.blend)** au cœur d'un **paysage naturel en parallaxe**, avec une **interface Mobile Store Pro ("Game Juice")**, **5 types de plateformes aux effets physiques francs** et un **Tableau des Scores par Seed** permettant de rejouer n'importe quel Seed pour battre son Highscore.
 
-## 📦 Téléchargement APK Android (`v1.1.0`)
+## 📦 Téléchargement APK Android (`v1.2.0`)
 
-- **Release GitHub `v1.1.0`** : [`https://github.com/orbitalstorm/vivienne-jump/releases/tag/v1.1.0`](https://github.com/orbitalstorm/vivienne-jump/releases/tag/v1.1.0)
-- **Téléchargement direct APK (`vivienne-jump-v1.1.0.apk`)** : [`https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.1.0/vivienne-jump-v1.1.0.apk`](https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.1.0/vivienne-jump-v1.1.0.apk)
-- **Lien alternatif (`vivijump-v1.1.0.apk`)** : [`https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.1.0/vivijump-v1.1.0.apk`](https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.1.0/vivijump-v1.1.0.apk)
+- **Release GitHub `v1.2.0`** : [`https://github.com/orbitalstorm/vivienne-jump/releases/tag/v1.2.0`](https://github.com/orbitalstorm/vivienne-jump/releases/tag/v1.2.0)
+- **Téléchargement direct APK (`vivienne-jump-v1.2.0.apk`)** : [`https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.2.0/vivienne-jump-v1.2.0.apk`](https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.2.0/vivienne-jump-v1.2.0.apk)
+- **Lien alternatif (`vivijump-v1.2.0.apk`)** : [`https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.2.0/vivijump-v1.2.0.apk`](https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.2.0/vivijump-v1.2.0.apk)
 
 ---
 
-## ✨ Nouveautés `v1.1.0` (`ORB-49`)
+## ✨ Nouveautés `v1.2.0` (`ORB-52` / `ORB-53`)
 
-1. **Interface Mobile Minimaliste & Épurée** :
-   - Canevas de jeu 100 % plein écran sans barres opaques intrusives.
-   - HUD flottant en pilules translucides (*glassmorphic pills*) affichant l'altitude, le score, le badge de **Seed déterministe (`SEED #...`)**, l'inclinomètre fin (`CALIBRER 0°`) et un dock de navigation flottant épuré.
-2. **Challenge Repensé & Génération Procédurale par Seed** :
-   - **100 % déterministe par Seed** : un générateur `_levelRng` dédié garantit qu'un même seed produit exactement la même séquence de plateformes à chaque partie (`20261112`, `777`, `42`, `1854`, `90210`).
-   - **Densité réduite & précision accrue** : espacement vertical accru et plateformes affinées pour imposer une vraie maîtrise de l'inclinaison du téléphone afin de ne pas tomber.
-   - **Maximum 3 plateformes à portée de saut** : invariant physique strict vérifié sur chaque palier (`1 <= getPlatformsInJumpReach(p).length <= 3`).
-   - **Atteignabilité garantie à 100 %** : chaque plateforme suivante est mathématiquement atteignable depuis la précédente (avec un saut normal, ou avec le saut bonus/ressort lorsqu'il y en a un).
-3. **Paysage Thème Naturel avec Effet de Parallaxe (6 Plans)** :
-   - **Soleil radieux (`Soleil`)** avec rayons crépusculaires et halos lumineux (`parallaxe 0.04`).
-   - **Nuages volumétriques (`Nuages`)** sur 3 plans de profondeur et oiseaux en vol (`parallaxe 0.12 / 0.25 / 0.38`).
-   - **Montagnes alpines & brume de vallée (`parallaxe 0.16`)**, **collines verdoyantes boisées (`parallaxe 0.30`)** et **arbres détaillés au premier plan (`Arbres` : pins étagés, chênes et cerisiers en fleurs Blossom, `parallaxe 0.44 / 0.48`)**.
+1. **5 Types de Plateformes aux Effets Physiques & Visuels Francs (< 100 ms)** :
+   - **Malle Monogram Ébène (`STABLE ×1.0`)** : Appui de référence franc (`~205 px`) avec zone cible centrale dorée de *Rebond Parfait* (`±24 %`).
+   - **Malle Ressort Or 24K (`SUPER ×1.45` — Saut Plus Haut)** : Propulse Vivienne **>2.1× plus haut** (`~432 px`) avec double ressort hélicoïdal doré, chevrons `▲▲`, pose *Grand Saut (Frame 60)* et bonus `+100 × combo` pts.
+   - **Nuage Damier Amorti (`AMORTI ×0.85` — Saut Moins Haut & Éclat +12 %)** : Absorbe l'impact et réduit la hauteur du saut (`~148 px`), imposant un saut court et nerveux vers le palier suivant (garanti atteignable à `98..116 px`) tout en rechargeant **+12 % de la jauge Éclat Blossom**.
+   - **Pétale de Soie Blossom Éphémère (`1× REBOND` — Disparaît après 1 rebond)** : Offre une impulsion vive (`×1.06`) mais **se brise et disparaît en 14 pétales de soie tourbillonnants dès le 1er rebond** (`singleUse: true`).
+   - **Lanière Cuir Vachetta Mobile (`MOBILE ×1.14` — Rail Mobile)** : Patrouille horizontale sur rail pointillé lumineux avec flèches directionnelles, rebond tonique (`×1.14`, `~267 px`) et bonus `+45 × combo` pts.
+2. **Tableau des Scores par Seed & Rejouabilité Ciblée (« REJOUER CE SEED »)** :
+   - Présent sur le **Menu d'Accueil Store (avant de lancer une partie)** et sur l'**Écran Game Over (après une partie)**.
+   - Indique le **Rang (`#1`, `#2`, `#3`...)**, le **Score (`pts`)**, l'**Altitude (`m`)**, le **Seed (`SEED #...`)** et le **Highscore du Seed**, avec un bouton 3D direct **« REJOUER CE SEED »** pour relancer ce parcours exact et battre son record.
+   - Ligne horizontale dorée **`RECORD SEED #...`** peinte directement dans l'arène à l'altitude du record à battre.
+3. **Refonte UI Mobile Store Pro & "Game Juice" (`mobile-game-ui` Mode B)** :
+   - Boutons tactiles 3D `Juicy3DGameButton` (*Squash & Stretch* `0.93`, lèvre 3D réactive, retours haptiques natifs `HapticFeedback`, cibles `>= 48×48dp` en *Thumb Zone*), compteurs interpolés `InterpolatedHudTicker` isolés par `RepaintBoundary`.
 
 ## 🛠️ Développement & Compilation
 
