@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
+  <defs>
+    <!-- 24K Gold Multi-Planar Gradients -->
+    <linearGradient id="tt-gold-main" x1="0%" y1="0%" x2="100%" y2="85%">
+      <stop offset="0%" stop-color="#FFFDE7" />
+      <stop offset="25%" stop-color="#FFE57F" />
+      <stop offset="60%" stop-color="#FFC107" />
+      <stop offset="88%" stop-color="#FF8F00" />
+      <stop offset="100%" stop-color="#C65100" />
+    </linearGradient>
+
+    <linearGradient id="tt-gold-rim" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFF59D" />
+      <stop offset="35%" stop-color="#FFFFFF" />
+      <stop offset="70%" stop-color="#FFD54F" />
+      <stop offset="100%" stop-color="#FF6F00" />
+    </linearGradient>
+
+    <!-- Louis Vuitton Trunk Wood Plinth Gradient -->
+    <linearGradient id="tt-lv-wood" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#795548" />
+      <stop offset="45%" stop-color="#4E342E" />
+      <stop offset="100%" stop-color="#27140E" />
+    </linearGradient>
+
+    <!-- Turntable Velvet / Stage Top Surface -->
+    <radialGradient id="tt-stage-top" cx="45%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#FFF8E1" />
+      <stop offset="55%" stop-color="#FFD54F" />
+      <stop offset="100%" stop-color="#E65100" />
+    </radialGradient>
+
+    <!-- Candy Blossom Corolla Petals (Vivienne Figurine Head) -->
+    <radialGradient id="tt-blossom-petal" cx="38%" cy="32%" r="70%">
+      <stop offset="0%" stop-color="#FFF0F6" />
+      <stop offset="32%" stop-color="#FF80AB" />
+      <stop offset="72%" stop-color="#F50057" />
+      <stop offset="100%" stop-color="#880E4F" />
+    </radialGradient>
+
+    <!-- Warm Maple / Ivory Wood Face Disk -->
+    <radialGradient id="tt-face-wood" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#FFFDF7" />
+      <stop offset="60%" stop-color="#FFE0B2" />
+      <stop offset="100%" stop-color="#FFB74D" />
+    </radialGradient>
+
+    <!-- 360° Dynamic Orbital Arrows Gradient -->
+    <linearGradient id="tt-orbit-cyan" x1="0%" y1="0%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#E0F7FA" />
+      <stop offset="40%" stop-color="#26C6DA" />
+      <stop offset="100%" stop-color="#0077C2" />
+    </linearGradient>
+  </defs>
+
+  <!-- CALQUE 1 : BASE SHADOW & SILHOUETTE OFFSET -->
+  <g id="base-shadow">
+    <!-- Ground Ambient Shadow -->
+    <ellipse cx="64" cy="117" rx="50" ry="8" fill="#2B1105" opacity="0.32" />
+    <ellipse cx="64" cy="116" rx="38" ry="5" fill="#2B1105" opacity="0.45" />
+
+    <!-- Sticker Drop Shadow Silhouette -->
+    <g transform="translate(0, 3.5)" opacity="0.34">
+      <circle cx="64" cy="44" r="31" fill="#2B1105" />
+      <ellipse cx="64" cy="96" rx="48" ry="18" fill="#2B1105" />
+    </g>
+  </g>
+
+  <!-- CALQUE 2 & 3 : MAIN BODY, SUB-ASSEMBLIES & MICRO-DETAILS -->
+  <g id="main-body">
+    <!-- Rear Orbital Rotation Track (Behind Figurine) -->
+    <path d="M 18 82 A 48 15 0 0 1 110 82"
+          fill="none" stroke="#2B1105" stroke-width="6.5" stroke-linecap="round" opacity="0.45" />
+    <path d="M 18 82 A 48 15 0 0 1 110 82"
+          fill="none" stroke="#FFE57F" stroke-width="2.5" stroke-dasharray="4 4" stroke-linecap="round" />
+
+    <!-- Turntable Podium Base (Socle Rotatif Bois LV & Or 24K) -->
+    <g id="turntable-podium">
+      <!-- Lower Louis Vuitton Trunk Wood Cylinder -->
+      <path d="M 22 92 L 22 104 A 42 12 0 0 0 106 104 L 106 92 Z"
+            fill="url(#tt-lv-wood)" stroke="#2B1105" stroke-width="4.2" stroke-linejoin="round" />
+      <!-- Wood Cylinder Right Shadow Plane -->
+      <path d="M 64 92 L 104 92 L 104 104 A 42 12 0 0 1 64 115 Z"
+            fill="#1B0905" opacity="0.45" />
+      <!-- Brass Trunk Corner Rivets -->
+      <circle cx="31" cy="101" r="2.2" fill="#FFD54F" stroke="#2B1105" stroke-width="1.3" />
+      <circle cx="44" cy="105" r="2.2" fill="#FFD54F" stroke="#2B1105" stroke-width="1.3" />
+      <circle cx="84" cy="105" r="2.2" fill="#FFD54F" stroke="#2B1105" stroke-width="1.3" />
+      <circle cx="97" cy="101" r="2.2" fill="#FFD54F" stroke="#2B1105" stroke-width="1.3" />
+
+      <!-- 24K Gold Rotating Bevel Ring -->
+      <path d="M 19 84 L 19 93 A 45 13 0 0 0 109 93 L 109 84 Z"
+            fill="url(#tt-gold-main)" stroke="#2B1105" stroke-width="4.2" stroke-linejoin="round" />
+
+      <!-- Top Rotating Platter Disk -->
+      <ellipse cx="64" cy="84" rx="45" ry="13"
+               fill="url(#tt-stage-top)" stroke="#2B1105" stroke-width="4.2" />
+      <!-- Inner Engraved Gold Platter Ring -->
+      <ellipse cx="64" cy="84" rx="34" ry="9"
+               fill="none" stroke="#2B1105" stroke-width="2" opacity="0.65" />
+      <!-- Figurine Contact Shadow on Platter -->
+      <ellipse cx="64" cy="84" rx="18" ry="5.2" fill="#2B1105" opacity="0.38" />
+    </g>
+
+    <!-- Central Figurine Vivienne / Blossom Medallion on Turntable -->
+    <g id="vivienne-figurine">
+      <!-- Golden Diagonal Calyx Rays Behind Corolla -->
+      <polygon points="64,10 71,29 90,20 81,39 100,46 81,53 90,72 71,63 64,82 57,63 38,72 47,53 28,46 47,39 38,20 57,29"
+               fill="url(#tt-gold-main)" stroke="#2B1105" stroke-width="3.6" stroke-linejoin="round" />
+
+      <!-- Vivienne Sculpted Trunk Body / Pedestal Torso -->
+      <path d="M 51 64 L 77 64 L 81 83 C 81 87 73 89 64 89 C 55 89 47 87 47 83 Z"
+            fill="url(#tt-lv-wood)" stroke="#2B1105" stroke-width="3.8" stroke-linejoin="round" />
+      <!-- Golden LV Belt & Collar on Torso -->
+      <path d="M 49 74 Q 64 78 79 74" fill="none" stroke="url(#tt-gold-rim)" stroke-width="3.5" />
+      <path d="M 49 74 Q 64 78 79 74" fill="none" stroke="#2B1105" stroke-width="1.6" />
+      <!-- Little Articulated Side Arms -->
+      <ellipse cx="44" cy="70" rx="5.5" ry="3.5" transform="rotate(-25 44 70)"
+               fill="url(#tt-gold-main)" stroke="#2B1105" stroke-width="3" />
+      <ellipse cx="84" cy="70" rx="5.5" ry="3.5" transform="rotate(25 84 70)"
+               fill="url(#tt-gold-main)" stroke="#2B1105" stroke-width="3" />
+
+      <!-- 4 Puffy Monogram Blossom Petals (Top, Bottom, Left, Right) -->
+      <g id="blossom-corolla">
+        <circle cx="64" cy="27" r="15.5" fill="url(#tt-blossom-petal)" stroke="#2B1105" stroke-width="4" />
+        <circle cx="64" cy="59" r="15.5" fill="url(#tt-blossom-petal)" stroke="#2B1105" stroke-width="4" />
+        <circle cx="48" cy="43" r="15.5" fill="url(#tt-blossom-petal)" stroke="#2B1105" stroke-width="4" />
+        <circle cx="80" cy="43" r="15.5" fill="url(#tt-blossom-petal)" stroke="#2B1105" stroke-width="4" />
+        <!-- Seamless Inner Corolla Fill -->
+        <circle cx="64" cy="43" r="18" fill="url(#tt-blossom-petal)" />
+      </g>
+
+      <!-- Vivienne Central Face Medallion -->
+      <circle cx="64" cy="43" r="14.5" fill="url(#tt-face-wood)" stroke="#2B1105" stroke-width="3.4" />
+
+      <!-- Left Eye: 4-Point Golden Monogram Star Eye -->
+      <polygon points="58,38 59.8,41.2 63,43 59.8,44.8 58,48 56.2,44.8 53,43 56.2,41.2"
+               fill="url(#tt-gold-main)" stroke="#2B1105" stroke-width="1.8" stroke-linejoin="round" />
+      <!-- Right Eye: Cute Glossy Doll Eye -->
+      <circle cx="70.5" cy="43" r="2.8" fill="#2B1105" />
+      <!-- Center Golden Diamond Nose / Emblem -->
+      <polygon points="64,70 66.5,74 64,78 61.5,74"
+               fill="#FFF59D" stroke="#2B1105" stroke-width="1.8" stroke-linejoin="round" />
+    </g>
+
+    <!-- Dynamic 360° Orbital Rotation Arrows & Plaque (◄ 360° ►) -->
+    <g id="turntable-360-arrows">
+      <!-- Left Sweeping 360° Arrow Ribbon (◄) -->
+      <path d="M 46 105 C 24 102 11 94 11 84 C 11 79 15 74 22 71 L 26 76 C 21 78 18 81 18 84 C 18 90 29 96 46 98 Z"
+            fill="url(#tt-orbit-cyan)" stroke="#2B1105" stroke-width="3.2" stroke-linejoin="round" />
+      <!-- Left Arrowhead Pointing Counter-Clockwise / Outward -->
+      <polygon points="6,81 20,73 19,89"
+               fill="url(#tt-gold-main)" stroke="#2B1105" stroke-width="3.2" stroke-linejoin="round" />
+
+      <!-- Right Sweeping 360° Arrow Ribbon (►) -->
+      <path d="M 82 105 C 104 102 117 94 117 84 C 117 79 113 74 106 71 L 102 76 C 107 78 110 81 110 84 C 110 90 99 96 82 98 Z"
+            fill="url(#tt-orbit-cyan)" stroke="#2B1105" stroke-width="3.2" stroke-linejoin="round" />
+      <!-- Right Arrowhead Pointing Clockwise / Outward -->
+      <polygon points="122,81 108,73 109,89"
+               fill="url(#tt-gold-main)" stroke="#2B1105" stroke-width="3.2" stroke-linejoin="round" />
+
+      <!-- Center Front 360° Golden Cartouche Plaque -->
+      <rect x="44" y="94" width="40" height="16" rx="8"
+            fill="url(#tt-gold-rim)" stroke="#2B1105" stroke-width="3.4" />
+      <!-- Stylised "360°" Technical Vector Glyphs -->
+      <text x="64" y="105.5" text-anchor="middle" font-family="Arial Black, Impact, sans-serif"
+            font-weight="900" font-size="10.5" fill="#2B1105" letter-spacing="0.3">360°</text>
+    </g>
+  </g>
+
+  <!-- CALQUE 4 : HARD-EDGED SPECULAR HIGHLIGHTS & SPARKLES -->
+  <g id="specular-highlights">
+    <!-- Top & Left Petal Candy Glaze Specular Arcs -->
+    <path d="M 56 20 A 11 11 0 0 1 70 18"
+          fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" opacity="0.92" />
+    <path d="M 39 38 A 10 10 0 0 1 44 32"
+          fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.90" />
+    <path d="M 82 34 A 10 10 0 0 1 88 40"
+          fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" opacity="0.85" />
+
+    <!-- Face & Eye Specular Glints -->
+    <circle cx="69.5" cy="42" r="1.1" fill="#FFFFFF" />
+    <circle cx="57.5" cy="42" r="1.1" fill="#FFFFFF" />
+
+    <!-- Turntable Gold Rim & Orbit Highlights -->
+    <path d="M 27 89 Q 42 94 58 95"
+          fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" opacity="0.92" />
+    <path d="M 22 97 Q 34 101 42 102"
+          fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" opacity="0.65" />
+    <line x1="50" y1="97" x2="72" y2="97" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" opacity="0.9" />
+
+    <!-- Cartoon Four-Point Sparkles -->
+    <polygon points="22,22 24.5,27.5 30,30 24.5,32.5 22,38 19.5,32.5 14,30 19.5,27.5"
+             fill="#FFFFFF" stroke="#2B1105" stroke-width="2.2" stroke-linejoin="round" />
+    <polygon points="106,24 108,28 112,30 108,32 106,36 104,32 100,30 104,28"
+             fill="#FFF59D" stroke="#2B1105" stroke-width="2" stroke-linejoin="round" />
+  </g>
+</svg>

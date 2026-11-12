@@ -1,8 +1,8 @@
 name: vivienne_jump
-description: "VIVIENNE : L'Odyssée Blossom v1.3.0 — Jeu d'ascension verticale Haute Couture (Doodle Jump clone) en mode Portrait propulsé par l'asset Blender 3D vivienne_speedy_v03.blend, UI Cartoon Pop (Angry Birds / Candy Crush), physique de particules par plateforme et disparition des plateformes hors écran."
+description: "VIVIENNE : L'Odyssée Blossom v1.4.0 — Jeu d'ascension verticale Haute Couture en mode Portrait avec Menu d'Accueil Cartoon, Tableau Highscores dédié et Galerie Vivienne en Turntable 360° pilotée par l'inclinaison du téléphone."
 publish_to: 'none'
 
-version: 1.3.0+4
+version: 1.4.0+5
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -33,3 +33,28 @@ flutter:
     - assets/cartoon/cartoon_crown_edition.svg
     - assets/cartoon/cartoon_blossom_star.svg
     - assets/cartoon/cartoon_cube_3d.svg
+    - assets/cartoon/cartoon_turntable_gallery.svg
+    - assets/turntable/vivienne_turntable_00.png
+    - assets/turntable/vivienne_turntable_01.png
+    - assets/turntable/vivienne_turntable_02.png
+    - assets/turntable/vivienne_turntable_03.png
+    - assets/turntable/vivienne_turntable_04.png
+    - assets/turntable/vivienne_turntable_05.png
+    - assets/turntable/vivienne_turntable_06.png
+    - assets/turntable/vivienne_turntable_07.png
+    - assets/turntable/vivienne_turntable_08.png
+    - assets/turntable/vivienne_turntable_09.png
+    - assets/turntable/vivienne_turntable_10.png
+    - assets/turntable/vivienne_turntable_11.png
+    - assets/turntable/vivienne_turntable_12.png
+    - assets/turntable/vivienne_turntable_13.png
+    - assets/turntable/vivienne_turntable_14.png
+    - assets/turntable/vivienne_turntable_15.png
+    - assets/turntable/vivienne_turntable_16.png
+    - assets/turntable/vivienne_turntable_17.png
+    - assets/turntable/vivienne_turntable_18.png
+    - assets/turntable/vivienne_turntable_19.png
+    - assets/turntable/vivienne_turntable_20.png
+    - assets/turntable/vivienne_turntable_21.png
+    - assets/turntable/vivienne_turntable_22.png
+    - assets/turntable/vivienne_turntable_23.png

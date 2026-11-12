@@ -1,5 +1,24 @@
 # Changelog — VIVIENNE : L'Odyssée Blossom
 
+## `v1.4.0` (2026-11-12) — Menu d'Accueil Cartoon Épuré, Bouton/Modale Highscores Dédiés & Galerie Vivienne en Turntable 360° Gyroscopique (`ORB-58`, `ORB-61`, `ORB-62`)
+
+- **Menu d'Accueil Cartoon sans Tableau Highscore Direct (`_buildMainMenuOverlay` — `Key('main_menu_overlay')`)** :
+  - Séparation d'état entre `engine.isInMenu` et `engine.isHighscoresOpen` (`openHighscores()` / `closeHighscores()`).
+  - Au lancement de l'application, le joueur arrive sur un véritable **Menu d'Accueil Cartoon** (*Angry Birds / Candy Crush*) **sans arriver directement sur le tableau des Highscores** :
+    - Grande bannière ruban Cartoon `VIVIENNE : L'ODYSSÉE BLOSSOM` avec badges `SEED #...` et Édition active.
+    - Scène héroïque centrale de Vivienne (`pose5GrandApex`) dans un médaillon doré entouré d'étoiles Blossom et de couronnes royales, avec l'objectif du Seed actif (`Objectif Seed #...`).
+    - Gros bouton 3D vert lime **`JOUER SUR SEED #...`** (`Key('start_run_from_menu_button')`).
+    - Gros bouton 3D Or 24K **`TABLEAU DES HIGHSCORES`** (`Key('open_highscores_modal_button')`) avec l'emblème Trophée.
+    - Accès rapide aux catégories **`ÉDITIONS`**, **`HERBIER`** et **`GALERIE VIVIENNE`** (`Key('open_vivienne_gallery_button')`), ainsi qu'au sélecteur rapide de Seed déterministe.
+- **Tableau Highscore Accessible via un Bouton Highscore Dédié (`_buildHighscoresModalOverlay` — `Key('highscores_modal_overlay')`)** :
+  - Ouverture d'une modale dédiée `CartoonBouncyModal` en appuyant sur le bouton **`TABLEAU DES HIGHSCORES`** du menu d'accueil (`Key('open_highscores_modal_button')`) ou sur le bouton **`HIGHSCORES`** du HUD supérieur (`Key('open_menu_leaderboard_button')`).
+  - Affichage du **`TABLEAU DES SCORES PAR SEED (HIGHSCORES)`** avec médailles `#1..#5`, étoiles de maîtrise, boutons **`REJOUER CE SEED`** et bouton **`RETOUR MENU`** (`Key('close_highscores_modal_button')`).
+- **Suppression de la Catégorie Blender MCP & Transformation en Galerie Vivienne Turntable 360° (`ORB-61` [@Leonardo] & `ORB-62` [@Miyamoto])** :
+  - Suppression complète de l'onglet technique `BLENDER 3D` / `STUDIO 3D` (`vivienne_speedy_v03.blend`, `Rig 22 Os`, `5 MATÉRIAUX PBR OFFICIELS`).
+  - Création de l'asset vectoriel Cartoon 4-calques `assets/cartoon/cartoon_turntable_gallery.svg` et de `CartoonEmblemKind.turntableGallery` (`lib/painters/vivienne_cartoon_assets.dart`).
+  - Extraction alpha sans perte des **24 vues Cycles Turntable 360°** (`assets/turntable/vivienne_turntable_00.png..23.png`, tous les `15°` de `0°` à `345°`) et implémentation de `VivienneTurntableSpec`.
+  - Nouvelle catégorie **`GALERIE VIVIENNE — TURNTABLE 360°`** (`Key('vivienne_gallery_panel')` / `Key('vivienne_turntable_stage')`) permettant de **faire tourner le modèle 3D de Vivienne à 360° en utilisant l'inclinaison du téléphone** (`Sensor.TYPE_ACCELEROMETER` 60 Hz, `updateTurntable(double dt)`, glisser horizontal et boutons `TOURNER G.`, `FACE 0°`, `DOS 180°`, `TOURNER D.`), avec podium 3D rotatif doré, boussole angulaire en temps réel et sélecteur des 4 Éditions Haute Couture.
+
 ## `v1.3.0` (2026-11-12) — Disparition des Plateformes Hors Écran, Physique de Particules par Plateforme & Refonte Menu Cartoon (`ORB-54`, `ORB-56`, `ORB-57`)
 
 - **Gameplay — Disparition Immédiate des Plateformes Sortant par le Bas de l'Écran (`lib/engine/vivienne_jump_engine.dart`)** :

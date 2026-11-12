@@ -61,6 +61,23 @@ Future<Map<VivienneBlenderPose, ui.Image>> _loadTestBlenderSprites() async {
   return map;
 }
 
+Future<List<ui.Image?>> _loadTestTurntableSprites() async {
+  final List<ui.Image?> list = List<ui.Image?>.filled(
+    VivienneTurntableSpec.frameCount,
+    null,
+  );
+  for (int i = 0; i < VivienneTurntableSpec.frameCount; i++) {
+    final File f = File(VivienneTurntableSpec.assetPathForIndex(i));
+    if (await f.exists()) {
+      final Uint8List bytes = await f.readAsBytes();
+      final ui.Codec codec = await ui.instantiateImageCodec(bytes);
+      final ui.FrameInfo frame = await codec.getNextFrame();
+      list[i] = frame.image;
+    }
+  }
+  return list;
+}
+
 Future<void> _capturePortraitScreenshot(
   WidgetTester tester,
   GlobalKey boundaryKey,
@@ -296,7 +313,7 @@ void main() {
   );
 
   testWidgets(
-    'Portrait 1080x2400 Store UI, Seed Leaderboard (Menu & Game Over), Replay Seed & 6 high-res screenshots',
+    'Portrait 1080x2400 Cartoon Home Menu (without direct Highscores), Highscores Button/Modal, Galerie Vivienne Turntable 360° & screenshots',
     (WidgetTester tester) async {
       await tester.binding.setSurfaceSize(const Size(360, 800));
       addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -304,8 +321,12 @@ void main() {
       final Map<VivienneBlenderPose, ui.Image> sprites =
           await tester.runAsync(_loadTestBlenderSprites) ??
           <VivienneBlenderPose, ui.Image>{};
+      final List<ui.Image?> turntableSprites =
+          await tester.runAsync(_loadTestTurntableSprites) ??
+          List<ui.Image?>.filled(VivienneTurntableSpec.frameCount, null);
 
-      final VivienneJumpEngine engine = VivienneJumpEngine(seed: 777);
+      final VivienneJumpEngine engine = VivienneJumpEngine(seed: 777)
+        ..openMainMenu();
       final GlobalKey repaintKey = GlobalKey();
 
       await tester.pumpWidget(
@@ -314,35 +335,36 @@ void main() {
           child: VivienneJumpApp(
             engine: engine,
             initialSprites: sprites,
+            initialTurntableSprites: turntableSprites,
             autoStartTicker: false,
           ),
         ),
       );
-      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 80));
 
-      expect(find.textContaining('VIVIENNE'), findsWidgets);
-      expect(find.textContaining('INCLINAISON'), findsOneWidget);
-      expect(find.textContaining('SEED 777'), findsOneWidget);
-      expect(find.text('SCORES'), findsOneWidget);
-      expect(
-        find.textContaining(LvPlatformType.monogramTrunk.shortEffectLabel),
-        findsNothing,
-      );
-
-      // 1. Verify Store Menu & Seed Leaderboard before starting a run
-      await tester.tap(find.byKey(const Key('open_menu_leaderboard_button')));
-      await tester.pump(const Duration(milliseconds: 120));
+      // 1. Verify initial Cartoon Home Menu does NOT show the Highscores table directly
       expect(find.byKey(const Key('main_menu_overlay')), findsOneWidget);
+      expect(find.byKey(const Key('highscores_modal_overlay')), findsNothing);
       expect(
         find.textContaining('TABLEAU DES SCORES PAR SEED'),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('open_highscores_modal_button')),
         findsOneWidget,
       );
-      expect(find.text('REJOUER CE SEED'), findsWidgets);
+      expect(
+        find.byKey(const Key('start_run_from_menu_button')),
+        findsOneWidget,
+      );
+      expect(find.text('BLENDER 3D'), findsNothing);
+      expect(find.textContaining('vivienne_speedy_v03.blend'), findsNothing);
       expect(
         find.textContaining(LvPlatformType.monogramTrunk.shortEffectLabel),
         findsNothing,
       );
 
+      // Capture Cartoon Home Menu (without Highscores table)
       await tester.runAsync(
         () => _capturePortraitScreenshot(
           tester,
@@ -351,7 +373,25 @@ void main() {
         ),
       );
 
-      // Tap "REJOUER CE SEED" on Seed #42 from the Menu Leaderboard
+      // 2. Verify tapping the Highscores button opens the Highscores modal with the Seed Leaderboard
+      await tester.tap(find.byKey(const Key('open_highscores_modal_button')));
+      await tester.pump(const Duration(milliseconds: 120));
+      expect(find.byKey(const Key('highscores_modal_overlay')), findsOneWidget);
+      expect(
+        find.textContaining('TABLEAU DES SCORES PAR SEED'),
+        findsOneWidget,
+      );
+      expect(find.text('REJOUER CE SEED'), findsWidgets);
+
+      await tester.runAsync(
+        () => _capturePortraitScreenshot(
+          tester,
+          repaintKey,
+          'screenshots/09_highscores_modal_leaderboard.png',
+        ),
+      );
+
+      // Tap "REJOUER CE SEED" on Seed #42 from the Highscores Modal Leaderboard
       final Finder replaySeed42InMenu = find.byKey(
         const Key('menu_replay_seed_42'),
       );
@@ -360,9 +400,18 @@ void main() {
       await tester.tap(replaySeed42InMenu);
       await tester.pump(const Duration(milliseconds: 120));
       expect(engine.isInMenu, isFalse);
+      expect(engine.isHighscoresOpen, isFalse);
       expect(engine.seed, equals(42));
 
-      // 2. Verify Game Over Seed Leaderboard & "REJOUER CE SEED" action
+      // Verify Top HUD Highscores button also opens Highscores Modal directly
+      await tester.tap(find.byKey(const Key('open_menu_leaderboard_button')));
+      await tester.pump(const Duration(milliseconds: 120));
+      expect(find.byKey(const Key('highscores_modal_overlay')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('close_highscores_modal_button')));
+      await tester.pump(const Duration(milliseconds: 120));
+      expect(find.byKey(const Key('highscores_modal_overlay')), findsNothing);
+
+      // 3. Verify Game Over Seed Leaderboard & "REJOUER CE SEED" action
       engine.score = 4150;
       engine.altitudeMeters = 335;
       engine.recordRunScore();
@@ -481,13 +530,35 @@ void main() {
         ),
       );
 
-      // Screenshot 6: Atelier Blender 3D (vivienne_speedy_v03.blend) & Rig 22 Os
-      await tester.tap(find.text('BLENDER 3D'));
+      // 4. Verify Galerie Vivienne Turntable 360° replaces Blender 3D and rotates with phone tilt
+      expect(find.text('BLENDER 3D'), findsNothing);
+      await tester.tap(find.text('GALERIE VIVIENNE'));
       await tester.pump(const Duration(milliseconds: 80));
+      expect(find.byKey(const Key('vivienne_gallery_panel')), findsOneWidget);
+      expect(find.byKey(const Key('vivienne_turntable_stage')), findsOneWidget);
       expect(
-        find.textContaining('vivienne_speedy_v03.blend'),
-        findsWidgets,
+        find.textContaining('GALERIE VIVIENNE — TURNTABLE 360°'),
+        findsOneWidget,
       );
+      expect(find.textContaining('vivienne_speedy_v03.blend'), findsNothing);
+
+      // Reset turntable to 0° then tilt phone to verify 360° gyroscopic turntable rotation
+      engine.calibrateTiltZero();
+      engine.setTurntableAngle(0.0);
+      await tester.pump(const Duration(milliseconds: 40));
+      expect(engine.turntableFrameIndex, equals(0));
+
+      engine.updateHardwareSensor(0.65, ax: -3.8, ay: 8.9, az: 1.2);
+      engine.updateTurntable(0.2);
+      await tester.pump(const Duration(milliseconds: 80));
+      expect(engine.turntableAngleDegrees, greaterThan(0.0));
+      expect(engine.turntableFrameIndex, isNot(equals(0)));
+
+      // Position at 330° (3/4 view showcasing Vachetta corolla, Monogram eye & Mini Speedy bag) for Screenshot 6
+      engine.setTurntableAngle(330.0);
+      await tester.pump(const Duration(milliseconds: 60));
+
+      // Screenshot 6: Galerie Vivienne Turntable 360°
       await tester.runAsync(
         () => _capturePortraitScreenshot(
           tester,

@@ -17,6 +17,7 @@ enum CartoonEmblemKind {
   crownEdition,
   blossomStar,
   cube3DStudio,
+  turntableGallery,
   playTriangle,
 }
 
@@ -105,6 +106,15 @@ class _CartoonEmblemPainter extends CustomPainter {
         );
       case CartoonEmblemKind.cube3DStudio:
         _paintCube3DStudio(
+          canvas,
+          center,
+          r,
+          outerStroke,
+          midStroke,
+          fineStroke,
+        );
+      case CartoonEmblemKind.turntableGallery:
+        _paintTurntableGallery(
           canvas,
           center,
           r,
@@ -816,7 +826,328 @@ class _CartoonEmblemPainter extends CustomPainter {
     );
   }
 
-  /// 5. PLAY TRIANGLE: Rounded beveled Cartoon Play arrow with warm ivory-gold
+  /// 5. TURNTABLE GALLERY: 360° Rotating Podium in 24K Gold & Louis Vuitton
+  /// Trunk Wood with sweeping orbital rotation arrows (`◄ 360° ►`) and a
+  /// sculpted Vivienne Blossom figurine on the stage platter.
+  void _paintTurntableGallery(
+    Canvas canvas,
+    Offset center,
+    double r,
+    Paint outerStroke,
+    Paint midStroke,
+    Paint fineStroke,
+  ) {
+    // Calque 1 : Ground shadow & sticker drop silhouette
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(center.dx, center.dy + r * 0.88),
+        width: r * 1.68,
+        height: r * 0.28,
+      ),
+      Paint()..color = _kOutlineDark.withValues(alpha: 0.34),
+    );
+
+    final Paint goldMainPaint = Paint()
+      ..shader = ui.Gradient.linear(
+        Offset(center.dx - r * 0.72, center.dy - r * 0.65),
+        Offset(center.dx + r * 0.72, center.dy + r * 0.75),
+        const <Color>[
+          Color(0xFFFFFDE7),
+          Color(0xFFFFE57F),
+          Color(0xFFFFC107),
+          Color(0xFFFF8F00),
+        ],
+        const <double>[0.0, 0.28, 0.68, 1.0],
+      );
+
+    final Paint woodPlinthPaint = Paint()
+      ..shader = ui.Gradient.linear(
+        Offset(center.dx - r * 0.70, center.dy + r * 0.35),
+        Offset(center.dx + r * 0.70, center.dy + r * 0.85),
+        const <Color>[
+          Color(0xFF795548),
+          Color(0xFF4E342E),
+          Color(0xFF27140E),
+        ],
+        const <double>[0.0, 0.50, 1.0],
+      );
+
+    // Calque 2 : Louis Vuitton Wood & 24K Gold Rotating Turntable Podium
+    final RRect woodBase = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(center.dx, center.dy + r * 0.62),
+        width: r * 1.44,
+        height: r * 0.34,
+      ),
+      Radius.circular(r * 0.16),
+    );
+    canvas.drawRRect(woodBase, woodPlinthPaint);
+    canvas.drawRRect(woodBase, outerStroke);
+
+    // Brass trunk rivets on wooden base
+    final Paint rivetPaint = Paint()..color = const Color(0xFFFFD54F);
+    for (final double dxFactor in <double>[-0.52, -0.26, 0.26, 0.52]) {
+      final Offset rivetCenter = Offset(
+        center.dx + r * dxFactor,
+        center.dy + r * 0.66,
+      );
+      canvas.drawCircle(rivetCenter, r * 0.042, rivetPaint);
+      canvas.drawCircle(rivetCenter, r * 0.042, fineStroke);
+    }
+
+    // 24K Gold rotating turntable platter rim & stage ellipse
+    final Rect platterBevelRect = Rect.fromCenter(
+      center: Offset(center.dx, center.dy + r * 0.44),
+      width: r * 1.54,
+      height: r * 0.42,
+    );
+    canvas.drawOval(platterBevelRect, goldMainPaint);
+    canvas.drawOval(platterBevelRect, outerStroke);
+
+    final Rect platterTopRect = Rect.fromCenter(
+      center: Offset(center.dx, center.dy + r * 0.38),
+      width: r * 1.42,
+      height: r * 0.36,
+    );
+    final Paint stageTopPaint = Paint()
+      ..shader = ui.Gradient.radial(
+        Offset(center.dx - r * 0.16, center.dy + r * 0.34),
+        r * 0.78,
+        const <Color>[
+          Color(0xFFFFF8E1),
+          Color(0xFFFFD54F),
+          Color(0xFFE65100),
+        ],
+        const <double>[0.0, 0.60, 1.0],
+      );
+    canvas.drawOval(platterTopRect, stageTopPaint);
+    canvas.drawOval(platterTopRect, midStroke);
+
+    // Figurine contact shadow on turntable stage
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(center.dx, center.dy + r * 0.38),
+        width: r * 0.62,
+        height: r * 0.16,
+      ),
+      Paint()..color = _kOutlineDark.withValues(alpha: 0.38),
+    );
+
+    // Sculpted Vivienne Blossom Figurine on Turntable
+    final Offset headCenter = Offset(center.dx, center.dy - r * 0.24);
+
+    // Diagonal golden calyx rays behind Vivienne's Blossom corolla
+    final Path calyxRays = _buildStarPath(
+      headCenter,
+      4,
+      r * 0.64,
+      r * 0.25,
+      rotationOffset: math.pi / 4.0,
+    );
+    canvas.drawPath(calyxRays, goldMainPaint);
+    canvas.drawPath(calyxRays, midStroke);
+
+    // Vivienne trunk torso standing on the turntable
+    final Path torsoPath = Path()
+      ..moveTo(center.dx - r * 0.22, center.dy + r * 0.04)
+      ..lineTo(center.dx + r * 0.22, center.dy + r * 0.04)
+      ..lineTo(center.dx + r * 0.28, center.dy + r * 0.36)
+      ..quadraticBezierTo(
+        center.dx,
+        center.dy + r * 0.44,
+        center.dx - r * 0.28,
+        center.dy + r * 0.36,
+      )
+      ..close();
+    canvas.drawPath(torsoPath, woodPlinthPaint);
+    canvas.drawPath(torsoPath, midStroke);
+
+    // 4 Puffy Candy-Glazed Monogram Blossom Petals
+    final Path corollaPath = Path();
+    for (int i = 0; i < 4; i++) {
+      final double angle = (i * math.pi / 2.0) - math.pi / 2.0;
+      final Offset petalPos = Offset(
+        headCenter.dx + math.cos(angle) * r * 0.27,
+        headCenter.dy + math.sin(angle) * r * 0.27,
+      );
+      corollaPath.addOval(
+        Rect.fromCircle(center: petalPos, radius: r * 0.30),
+      );
+    }
+    final Paint blossomPetalPaint = Paint()
+      ..shader = ui.Gradient.radial(
+        headCenter - Offset(r * 0.14, r * 0.16),
+        r * 0.78,
+        const <Color>[
+          Color(0xFFFFF0F6),
+          Color(0xFFFF80AB),
+          Color(0xFFF50057),
+          Color(0xFF880E4F),
+        ],
+        const <double>[0.0, 0.32, 0.72, 1.0],
+      );
+    canvas.drawPath(corollaPath, blossomPetalPaint);
+    canvas.drawPath(corollaPath, outerStroke);
+
+    // Vivienne inner maple/ivory face disk
+    final Paint faceDiskPaint = Paint()
+      ..shader = ui.Gradient.radial(
+        headCenter - Offset(r * 0.06, r * 0.06),
+        r * 0.34,
+        const <Color>[
+          Color(0xFFFFFDF7),
+          Color(0xFFFFE0B2),
+          Color(0xFFFFB74D),
+        ],
+        const <double>[0.0, 0.65, 1.0],
+      );
+    canvas.drawCircle(headCenter, r * 0.25, faceDiskPaint);
+    canvas.drawCircle(headCenter, r * 0.25, midStroke);
+
+    // Left eye: 4-point golden monogram star eye & right doll eye
+    final Path starEye = _buildStarPath(
+      Offset(headCenter.dx - r * 0.09, headCenter.dy),
+      4,
+      r * 0.09,
+      r * 0.038,
+    );
+    canvas.drawPath(starEye, goldMainPaint);
+    canvas.drawPath(starEye, fineStroke);
+    canvas.drawCircle(
+      Offset(headCenter.dx + r * 0.10, headCenter.dy),
+      r * 0.045,
+      Paint()..color = _kOutlineDark,
+    );
+
+    // Calque 3 : Dynamic 360° Orbital Rotation Arrows (◄ 360° ►)
+    final Rect orbitRect = Rect.fromCenter(
+      center: Offset(center.dx, center.dy + r * 0.48),
+      width: r * 1.78,
+      height: r * 0.54,
+    );
+    final Paint orbitCyanStroke = Paint()
+      ..shader = ui.Gradient.linear(
+        Offset(center.dx - r * 0.90, center.dy + r * 0.30),
+        Offset(center.dx + r * 0.90, center.dy + r * 0.70),
+        const <Color>[
+          Color(0xFFE0F7FA),
+          Color(0xFF26C6DA),
+          Color(0xFF0077C2),
+        ],
+        const <double>[0.0, 0.45, 1.0],
+      )
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = math.max(1.8, r * 0.13)
+      ..strokeCap = StrokeCap.round;
+
+    final Paint orbitOutlineStroke = Paint()
+      ..color = _kOutlineDark
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = math.max(3.0, r * 0.25)
+      ..strokeCap = StrokeCap.round;
+
+    // Left & right sweeping 360° orbital arcs
+    canvas.drawArc(
+      orbitRect,
+      math.pi * 0.58,
+      math.pi * 0.36,
+      false,
+      orbitOutlineStroke,
+    );
+    canvas.drawArc(
+      orbitRect,
+      math.pi * 0.58,
+      math.pi * 0.36,
+      false,
+      orbitCyanStroke,
+    );
+    canvas.drawArc(
+      orbitRect,
+      math.pi * 0.06,
+      math.pi * 0.36,
+      false,
+      orbitOutlineStroke,
+    );
+    canvas.drawArc(
+      orbitRect,
+      math.pi * 0.06,
+      math.pi * 0.36,
+      false,
+      orbitCyanStroke,
+    );
+
+    // Left arrowhead (◄) & Right arrowhead (►)
+    final Path leftArrowHead = Path()
+      ..moveTo(center.dx - r * 0.94, center.dy + r * 0.36)
+      ..lineTo(center.dx - r * 0.72, center.dy + r * 0.24)
+      ..lineTo(center.dx - r * 0.74, center.dy + r * 0.50)
+      ..close();
+    canvas.drawPath(leftArrowHead, goldMainPaint);
+    canvas.drawPath(leftArrowHead, midStroke);
+
+    final Path rightArrowHead = Path()
+      ..moveTo(center.dx + r * 0.94, center.dy + r * 0.36)
+      ..lineTo(center.dx + r * 0.72, center.dy + r * 0.24)
+      ..lineTo(center.dx + r * 0.74, center.dy + r * 0.50)
+      ..close();
+    canvas.drawPath(rightArrowHead, goldMainPaint);
+    canvas.drawPath(rightArrowHead, midStroke);
+
+    // Center front 360° golden cartouche badge
+    final RRect badge360 = RRect.fromRectAndRadius(
+      Rect.fromCenter(
+        center: Offset(center.dx, center.dy + r * 0.72),
+        width: r * 0.64,
+        height: r * 0.24,
+      ),
+      Radius.circular(r * 0.12),
+    );
+    canvas.drawRRect(badge360, goldMainPaint);
+    canvas.drawRRect(badge360, midStroke);
+
+    // Central diamond jewel on 360° cartouche
+    final Path badgeGem = _buildStarPath(
+      Offset(center.dx, center.dy + r * 0.72),
+      4,
+      r * 0.09,
+      r * 0.04,
+    );
+    canvas.drawPath(badgeGem, Paint()..color = const Color(0xFFFFFDE7));
+    canvas.drawPath(badgeGem, fineStroke);
+
+    // Calque 4 : Crisp hard-edged specular highlights (#FFFFFF)
+    final Paint specArcPaint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.92)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = math.max(1.2, r * 0.08)
+      ..strokeCap = StrokeCap.round;
+
+    // Top petal candy glaze highlight
+    canvas.drawArc(
+      Rect.fromCircle(
+        center: Offset(headCenter.dx, headCenter.dy - r * 0.27),
+        radius: r * 0.18,
+      ),
+      -math.pi * 0.82,
+      math.pi * 0.55,
+      false,
+      specArcPaint,
+    );
+    // Turntable gold rim highlight
+    canvas.drawLine(
+      Offset(center.dx - r * 0.48, center.dy + r * 0.52),
+      Offset(center.dx - r * 0.14, center.dy + r * 0.57),
+      specArcPaint,
+    );
+    // Eye specular glint
+    canvas.drawCircle(
+      Offset(headCenter.dx + r * 0.085, headCenter.dy - r * 0.015),
+      r * 0.02,
+      Paint()..color = Colors.white,
+    );
+  }
+
+  /// 6. PLAY TRIANGLE: Rounded beveled Cartoon Play arrow with warm ivory-gold
   /// multi-planar shading, bold `#2B1105` outline, and crisp top specular edge.
   void _paintPlayTriangle(
     Canvas canvas,

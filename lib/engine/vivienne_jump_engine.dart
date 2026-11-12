@@ -228,15 +228,31 @@ class VivienneJumpEngine extends ChangeNotifier {
   double groundSquashTimer = 0.0; // > 0 right after bouncing on a platform
   double grandLeapTimer = 0.0;
 
-  // Blender 3D Rig & Animation Inspector State
+  // Blender 3D Rig & Animation Inspector + 360° Turntable Gallery State
   bool showBlenderRigOverlay = false;
   double elapsedTime = 0.0;
   int totalJumpsInRun = 0;
+  double turntableAngleDegrees = 0.0;
+  double turntableAngularVelocity = 0.0;
+  double _lastTurntableTiltX = 0.0;
 
-  // Lifecycle & Menu State
+  // Lifecycle, Menu & Dedicated Highscores Modal State
   bool isInMenu = false;
+  bool isHighscoresOpen = false;
   bool isPaused = false;
   bool isGameOver = false;
+
+  /// Current 360° Turntable frame index (`0..23`, 15° steps) for the Galerie Vivienne.
+  int get turntableFrameIndex =>
+      VivienneTurntableSpec.frameIndexForAngle(turntableAngleDegrees);
+
+  /// Current 360° Turntable sprite asset path for the Galerie Vivienne.
+  String get turntableFrameAssetPath =>
+      VivienneTurntableSpec.assetPathForIndex(turntableFrameIndex);
+
+  /// Human-readable description of the current 360° Turntable camera angle.
+  String get turntableViewAngleLabel =>
+      VivienneTurntableSpec.angleLabelForDegrees(turntableAngleDegrees);
 
   // World Entities
   final List<LvPlatform> platforms = <LvPlatform>[];
@@ -336,6 +352,7 @@ class VivienneJumpEngine extends ChangeNotifier {
       recordRunScore();
     }
     isInMenu = false;
+    isHighscoresOpen = false;
     resetRun(seed: newSeed);
   }
 
@@ -346,22 +363,69 @@ class VivienneJumpEngine extends ChangeNotifier {
       recordRunScore();
     }
     isInMenu = false;
+    isHighscoresOpen = false;
     resetRun(seed: targetSeed);
   }
 
-  /// Opens the pre-game / store launch menu overlay (with Seed Leaderboard).
+  /// Opens the Cartoon Home Menu overlay (without landing on the Highscore table).
   void openMainMenu() {
     if (score > 0 && !_currentRunRecorded) {
       recordRunScore();
     }
     isInMenu = true;
+    isHighscoresOpen = false;
+    notifyListeners();
+  }
+
+  /// Opens the dedicated Highscores modal overlay (accessible via the Highscores button).
+  void openHighscores() {
+    if (score > 0 && !_currentRunRecorded) {
+      recordRunScore();
+    }
+    isHighscoresOpen = true;
+    notifyListeners();
+  }
+
+  /// Closes the dedicated Highscores modal overlay and returns to the Cartoon Home Menu or playfield.
+  void closeHighscores() {
+    isHighscoresOpen = false;
     notifyListeners();
   }
 
   /// Starts a fresh run from the main menu on `targetSeed` (or current `_seed`).
   void startRunFromMenu({int? targetSeed}) {
     isInMenu = false;
+    isHighscoresOpen = false;
     resetRun(seed: targetSeed ?? _seed);
+  }
+
+  /// Sets the 360° Turntable angle in degrees (`[0, 360)`).
+  void setTurntableAngle(double angleDegrees) {
+    turntableAngleDegrees = ((angleDegrees % 360.0) + 360.0) % 360.0;
+    notifyListeners();
+  }
+
+  /// Rotates the 360° Turntable by `deltaDegrees` (positive = clockwise/right, negative = left).
+  void rotateTurntableByDelta(double deltaDegrees) {
+    turntableAngleDegrees =
+        ((turntableAngleDegrees + deltaDegrees) % 360.0 + 360.0) % 360.0;
+    notifyListeners();
+  }
+
+  /// Advances the 360° Turntable rotation in the Galerie Vivienne based on phone inclination (`effectiveTiltX`).
+  void updateTurntable(double dt) {
+    final double step = dt.clamp(0.001, 0.05);
+    final double tilt = effectiveTiltX;
+    if (tilt.abs() > 0.03) {
+      turntableAngularVelocity = tilt * 155.0;
+      turntableAngleDegrees =
+          ((turntableAngleDegrees + turntableAngularVelocity * step) % 360.0 +
+              360.0) %
+          360.0;
+      notifyListeners();
+    } else {
+      turntableAngularVelocity = 0.0;
+    }
   }
 
   /// Cycles to the next curated deterministic seed.
@@ -395,19 +459,36 @@ class VivienneJumpEngine extends ChangeNotifier {
     lastSensorAx = ax;
     lastSensorAy = ay;
     lastSensorAz = az;
+    _applyImmediateTurntableTiltDelta();
+    notifyListeners();
   }
 
   /// Calibrates the current phone inclination as 0° neutral center.
   void calibrateTiltZero() {
     tiltCalibrationOffset = rawHardwareTiltX;
     manualTiltOverride = null;
+    _lastTurntableTiltX = 0.0;
+    turntableAngularVelocity = 0.0;
     notifyListeners();
   }
 
   /// Sets or clears manual/simulated tilt in `[-1.0, +1.0]` (used for touch assist or testing).
   void setManualTilt(double? tiltX) {
     manualTiltOverride = tiltX?.clamp(-1.15, 1.15);
+    _applyImmediateTurntableTiltDelta();
     notifyListeners();
+  }
+
+  void _applyImmediateTurntableTiltDelta() {
+    final double currentTilt = effectiveTiltX;
+    final double deltaTilt = currentTilt - _lastTurntableTiltX;
+    _lastTurntableTiltX = currentTilt;
+    if (deltaTilt.abs() > 1e-4) {
+      turntableAngleDegrees =
+          ((turntableAngleDegrees + deltaTilt * 120.0) % 360.0 + 360.0) %
+          360.0;
+      turntableAngularVelocity = currentTilt * 155.0;
+    }
   }
 
   /// Maximum vertical jump height (in world pixels) achievable when bouncing from `source`

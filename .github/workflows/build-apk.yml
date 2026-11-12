@@ -44,7 +44,7 @@ jobs:
       - name: Copy APK with versioned names
         run: |
           TAG_NAME="${GITHUB_REF#refs/tags/}"
-          if [[ "$TAG_NAME" != v* ]]; then TAG_NAME="v1.3.0"; fi
+          if [[ "$TAG_NAME" != v* ]]; then TAG_NAME="v1.4.0"; fi
           cp build/app/outputs/flutter-apk/app-release.apk "build/app/outputs/flutter-apk/vivienne-jump-${TAG_NAME}.apk"
           cp build/app/outputs/flutter-apk/app-release.apk "build/app/outputs/flutter-apk/vivijump-${TAG_NAME}.apk"
           ls -lh build/app/outputs/flutter-apk/

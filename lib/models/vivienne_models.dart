@@ -830,3 +830,43 @@ class BlenderPbrMaterialSpec {
         ),
       ];
 }
+
+/// 360° Cycles Turntable specification for the "Galerie Vivienne" (`24 frames`, every `15°`).
+class VivienneTurntableSpec {
+  const VivienneTurntableSpec._();
+
+  static const int frameCount = 24;
+  static const double degreesPerFrame = 360.0 / frameCount; // 15.0°
+
+  static String assetPathForIndex(int index) {
+    final int normalized = ((index % frameCount) + frameCount) % frameCount;
+    final String twoDigits = normalized.toString().padLeft(2, '0');
+    return 'assets/turntable/vivienne_turntable_$twoDigits.png';
+  }
+
+  static int frameIndexForAngle(double angleDegrees) {
+    final double norm = ((angleDegrees % 360.0) + 360.0) % 360.0;
+    return ((norm / degreesPerFrame).round()) % frameCount;
+  }
+
+  static String angleLabelForDegrees(double angleDegrees) {
+    final double norm = ((angleDegrees % 360.0) + 360.0) % 360.0;
+    if (norm < 22.5 || norm >= 337.5) {
+      return 'Vue de Face (0°) • Corolle Blossom & Œil Monogram';
+    } else if (norm < 67.5) {
+      return 'Vue 3/4 Gauche (45°) • Pétales Vachetta & Tranche Carmin';
+    } else if (norm < 112.5) {
+      return 'Profil Gauche (90°) • Galbe Cuir & Surpiqûre Sellier';
+    } else if (norm < 157.5) {
+      return 'Vue 3/4 Arrière Gauche (135°) • Dos Corolle & Chêne';
+    } else if (norm < 202.5) {
+      return 'Vue de Dos (180°) • Corps Bois Monogram & Mini Speedy';
+    } else if (norm < 247.5) {
+      return 'Vue 3/4 Arrière Droit (225°) • Silhouette & Mousquetons Or';
+    } else if (norm < 292.5) {
+      return 'Profil Droit (270°) • Mini Sac Speedy LV Suspendu';
+    } else {
+      return 'Vue 3/4 Droit (315°) • Côté Mini Sac Speedy & Rivets 24K';
+    }
+  }
+}
