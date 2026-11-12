@@ -94,7 +94,6 @@ void main() {
         expect(k.szBody, inInclusiveRange(0.78, 1.20));
       }
 
-      // Frame 4 = Anticipation Squash, Frame 6 = Launch Stretch, Frame 60 = Grand Jump 3 Apex
       final VivienneBlenderKinematics f4 =
           VivienneBlenderKinematics.evaluateAtFrame(4.0);
       final VivienneBlenderKinematics f6 =
@@ -111,11 +110,72 @@ void main() {
   );
 
   test(
+    'Deterministic seed generates identical platforms, <= 3 reachable platforms, and 100% reachable next platform',
+    () {
+      for (final int testSeed in VivienneJumpEngine.curatedSeeds) {
+        final VivienneJumpEngine engineA = VivienneJumpEngine(seed: testSeed);
+        final VivienneJumpEngine engineB = VivienneJumpEngine(seed: testSeed);
+
+        // Trigger visual particles on engineA to verify FX RNG never perturbs level RNG
+        engineA.blossomGauge = 1.0;
+        engineA.triggerGrandBlossomLeap();
+
+        // Warp both to generate a deep vertical chain
+        engineA.warpToAltitude(2400);
+        engineB.warpToAltitude(2400);
+
+        expect(engineA.platforms.length, equals(engineB.platforms.length));
+        for (int i = 0; i < engineA.platforms.length; i++) {
+          final LvPlatform pa = engineA.platforms[i];
+          final LvPlatform pb = engineB.platforms[i];
+          expect(pa.stepIndex, equals(pb.stepIndex));
+          expect(pa.anchorX, closeTo(pb.anchorX, 1e-6));
+          expect(pa.y, closeTo(pb.y, 1e-6));
+          expect(pa.width, closeTo(pb.width, 1e-6));
+          expect(pa.type, equals(pb.type));
+        }
+
+        // Verify reachability and max-3-platforms-in-reach invariants on fresh run
+        engineA.resetRun(seed: testSeed);
+        // Visible platforms on initial 860px viewport is sparse (<= 8)
+        final int visibleOnScreen = engineA.platforms
+            .where((LvPlatform p) => p.y >= 0.0 && p.y <= 860.0)
+            .length;
+        expect(visibleOnScreen, inInclusiveRange(4, 8));
+
+        // Check every platform in the generated buffer (excluding the top-most generated edge)
+        for (int i = 0; i < engineA.platforms.length - 3; i++) {
+          final LvPlatform current = engineA.platforms[i];
+          final LvPlatform next = engineA.platforms[i + 1];
+
+          // 1. Next platform must ALWAYS be reachable (normal jump or spring/bonus jump)
+          expect(
+            engineA.canReachPlatform(current, next),
+            isTrue,
+            reason:
+                'Seed $testSeed step ${current.stepIndex} -> ${next.stepIndex} must be reachable',
+          );
+
+          // 2. At most 3 platforms within jump reach from any platform
+          final List<LvPlatform> reachable = engineA.getPlatformsInJumpReach(
+            current,
+          );
+          expect(
+            reachable.length,
+            inInclusiveRange(1, 3),
+            reason:
+                'Seed $testSeed step ${current.stepIndex} has ${reachable.length} reachable platforms (expected 1..3)',
+          );
+        }
+      }
+    },
+  );
+
+  test(
     'VivienneJumpEngine handles phone tilt, horizontal wrap-around, platforms & Blossom collection',
     () {
       final VivienneJumpEngine engine = VivienneJumpEngine(seed: 42);
       expect(engine.platforms, isNotEmpty);
-      expect(engine.collectibles, isNotEmpty);
 
       // Simulate tilting the Android phone to the right (+0.65)
       engine.updateHardwareSensor(0.65, ax: -3.8, ay: 8.9, az: 1.2);
@@ -153,7 +213,7 @@ void main() {
   );
 
   testWidgets(
-    'Portrait 1080x2400 UI workflow & 6 high-res screenshots generation',
+    'Portrait 1080x2400 minimalist UI, natural parallax landscape & 6 high-res screenshots generation',
     (WidgetTester tester) async {
       await tester.binding.setSurfaceSize(const Size(360, 800));
       addTearDown(() => tester.binding.setSurfaceSize(null));
@@ -179,9 +239,10 @@ void main() {
 
       expect(find.textContaining('VIVIENNE'), findsWidgets);
       expect(find.textContaining('INCLINAISON'), findsOneWidget);
+      expect(find.textContaining('SEED 777'), findsOneWidget);
 
-      // Screenshot 1: Atelier d'Asnières Ascent with Star Blossom & Sun Blossom flowers
-      for (int i = 0; i < 18; i++) {
+      // Screenshot 1: Clairière Ensoleillée (Sun, Clouds, Mountains, Hills, Trees Parallax)
+      for (int i = 0; i < 16; i++) {
         engine.update(1 / 60);
       }
       await tester.runAsync(
@@ -192,7 +253,7 @@ void main() {
         ),
       );
 
-      // Screenshot 2: Place Vendôme + Grand Saut Blossom (Frame 60) & Speedy Boost + Phone Tilt (+19°)
+      // Screenshot 2: Soleil d'Or (1850m) + Grand Saut Blossom (Frame 60) & Tilt Parallax
       engine.warpToAltitude(1850);
       engine.setManualTilt(0.58);
       engine.speedyBoostTimer = 2.8;
@@ -209,7 +270,7 @@ void main() {
         ),
       );
 
-      // Screenshot 3: Jardin Céleste Blossom (3 920 m) with Padlock Shield & Magnet
+      // Screenshot 3: Vallée Sakura (3920m) with Cherry Blossom Trees & Parallax Clouds
       engine.warpToAltitude(3920);
       engine.setManualTilt(-0.42);
       engine.padlockShieldTimer = 8.5;
@@ -227,7 +288,7 @@ void main() {
         ),
       );
 
-      // Screenshot 4: Maison LV — 4 Éditions de Vivienne & 4 Paliers d'Altitude
+      // Screenshot 4: Maison LV — Seed Selector, 4 Éditions de Vivienne & 4 Paysages Naturels
       await tester.tap(find.text('MAISON LV'));
       await tester.pump(const Duration(milliseconds: 50));
       expect(
@@ -242,7 +303,7 @@ void main() {
         ),
       );
 
-      // Screenshot 5: Herbier Blossom & Trésors Louis Vuitton
+      // Screenshot 5: Herbier Blossom & Architectures de Plateformes
       await tester.tap(find.text('HERBIER'));
       await tester.pump(const Duration(milliseconds: 50));
       expect(

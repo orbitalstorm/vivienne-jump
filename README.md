@@ -1,29 +1,29 @@
-# VIVIENNE : L'Odyssée Blossom (`v1.0.0`) — Ascension Haute Couture en Mode Portrait
+# VIVIENNE : L'Odyssée Blossom (`v1.1.0`) — Ascension Naturelle & Minimaliste en Mode Portrait
 
-**VIVIENNE : L'Odyssée Blossom (`v1.0.0` — `cloud.orbital8.vivienne_jump`)** est un jeu Android d'ascension verticale (*Doodle Jump clone*) développé en Flutter, mettant en scène l'asset 3D Blender officiel **[`models/vivienne_speedy_v03.blend`](https://github.com/orbitalstorm/BLENDER_LAB/blob/main/models/vivienne_speedy_v03.blend)** dans l'univers **Louis Vuitton & Blossom Flowers**.
+**VIVIENNE : L'Odyssée Blossom (`v1.1.0` — `cloud.orbital8.vivienne_jump`)** est un jeu Android d'ascension verticale (*Doodle Jump clone*) développé en Flutter, mettant en scène l'asset 3D Blender officiel **[`models/vivienne_speedy_v03.blend`](https://github.com/orbitalstorm/BLENDER_LAB/blob/main/models/vivienne_speedy_v03.blend)** au cœur d'un **paysage naturel en parallaxe** avec une **interface mobile minimaliste** et un **parcours déterministe par Seed**.
 
-## 📦 Téléchargement APK Android (`v1.0.0`)
+## 📦 Téléchargement APK Android (`v1.1.0`)
 
-- **Release GitHub `v1.0.0`** : [`https://github.com/orbitalstorm/vivienne-jump/releases/tag/v1.0.0`](https://github.com/orbitalstorm/vivienne-jump/releases/tag/v1.0.0)
-- **Téléchargement direct APK (`vivienne-jump-v1.0.0.apk`)** : [`https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.0.0/vivienne-jump-v1.0.0.apk`](https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.0.0/vivienne-jump-v1.0.0.apk)
-- **Lien alternatif (`vivijump-v1.0.0.apk`)** : [`https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.0.0/vivijump-v1.0.0.apk`](https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.0.0/vivijump-v1.0.0.apk)
+- **Release GitHub `v1.1.0`** : [`https://github.com/orbitalstorm/vivienne-jump/releases/tag/v1.1.0`](https://github.com/orbitalstorm/vivienne-jump/releases/tag/v1.1.0)
+- **Téléchargement direct APK (`vivienne-jump-v1.1.0.apk`)** : [`https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.1.0/vivienne-jump-v1.1.0.apk`](https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.1.0/vivienne-jump-v1.1.0.apk)
+- **Lien alternatif (`vivijump-v1.1.0.apk`)** : [`https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.1.0/vivijump-v1.1.0.apk`](https://github.com/orbitalstorm/vivienne-jump/releases/download/v1.1.0/vivijump-v1.1.0.apk)
 
 ---
 
-## ✨ Fonctionnalités & Habillage Louis Vuitton
+## ✨ Nouveautés `v1.1.0` (`ORB-49`)
 
-1. **Intégration 3D Blender (`models/vivienne_speedy_v03.blend`)** :
-   - Sprites Cycles 3D haute définition détourés sans perte à partir des rendus studio de `vivienne_speedy_v03.blend` (Frames `04`, `06`, `12`, `21`, `60` + Overlay Rig 22 Os `Vivienne_Rig`).
-   - Cinématique Hermite périodique exacte (`72 frames @ 24 FPS` — 3 sauts consécutifs) avec **Squash & Stretch à volume constant (`sx * sy * sz = 1.0`)**, élévation des bras en V de célébration et oscillation pendulaire du mini sac Speedy LV.
-2. **Contrôle par Inclinaison du Téléphone (Mode Portrait Uniquement)** :
-   - Pont capteur matériel Android natif (`Sensor.TYPE_ACCELEROMETER` via `EventChannel('cloud.orbital8.vivienne_jump/tilt')` à 60 Hz `SENSOR_DELAY_GAME`).
-   - Inclinomètre en temps réel intégré au HUD avec bouton **`CALIBRER 0°`**, traversée horizontale des bords d'écran (*screen wrap-around* Doodle Jump) et assistance tactile.
-3. **Collectibles Blossom Flowers & Objets Maison Louis Vuitton** :
-   - **Fleur Star Blossom Or 24K** (`lv_neo_star_blossom.blend`), **Fleur Sun Blossom Corolle**, **Fleur Neo Blossom Nacre & Diamant**.
-   - **Mini Sac Speedy Monogram (Ascension Supersonique)**, **Cadenas & Clé LV Or 24K (Bouclier Protecteur 10s)**, **Aimant Fleur de Monogramme (Attraction 360°)** et bouton actif **`ÉCLAT BLOSSOM`** (*Grand Saut Célébration Frame 60*).
-4. **5 Types de Plateformes & 4 Paliers d'Altitude Verticaux** :
-   - *Malle Monogram Ébène*, *Lanière Cuir Vachetta Mobile* (tranche rouge carmin `#8B1E24` & surpiqûre jaune `#E5B842`), *Pétale de Soie Éphémère*, *Malle à Serrure Ressort Or 24K* (`×1.75`) et *Nuage Damier Céleste*.
-   - *Atelier d'Asnières (0 m+)*, *Place Vendôme (1 500 m+)*, *Jardin Céleste Blossom (3 500 m+)* et *Stratosphère Studio Cycles (6 000 m+)*.
+1. **Interface Mobile Minimaliste & Épurée** :
+   - Canevas de jeu 100 % plein écran sans barres opaques intrusives.
+   - HUD flottant en pilules translucides (*glassmorphic pills*) affichant l'altitude, le score, le badge de **Seed déterministe (`SEED #...`)**, l'inclinomètre fin (`CALIBRER 0°`) et un dock de navigation flottant épuré.
+2. **Challenge Repensé & Génération Procédurale par Seed** :
+   - **100 % déterministe par Seed** : un générateur `_levelRng` dédié garantit qu'un même seed produit exactement la même séquence de plateformes à chaque partie (`20261112`, `777`, `42`, `1854`, `90210`).
+   - **Densité réduite & précision accrue** : espacement vertical accru et plateformes affinées pour imposer une vraie maîtrise de l'inclinaison du téléphone afin de ne pas tomber.
+   - **Maximum 3 plateformes à portée de saut** : invariant physique strict vérifié sur chaque palier (`1 <= getPlatformsInJumpReach(p).length <= 3`).
+   - **Atteignabilité garantie à 100 %** : chaque plateforme suivante est mathématiquement atteignable depuis la précédente (avec un saut normal, ou avec le saut bonus/ressort lorsqu'il y en a un).
+3. **Paysage Thème Naturel avec Effet de Parallaxe (6 Plans)** :
+   - **Soleil radieux (`Soleil`)** avec rayons crépusculaires et halos lumineux (`parallaxe 0.04`).
+   - **Nuages volumétriques (`Nuages`)** sur 3 plans de profondeur et oiseaux en vol (`parallaxe 0.12 / 0.25 / 0.38`).
+   - **Montagnes alpines & brume de vallée (`parallaxe 0.16`)**, **collines verdoyantes boisées (`parallaxe 0.30`)** et **arbres détaillés au premier plan (`Arbres` : pins étagés, chênes et cerisiers en fleurs Blossom, `parallaxe 0.44 / 0.48`)**.
 
 ## 🛠️ Développement & Compilation
 

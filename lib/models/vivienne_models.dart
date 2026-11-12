@@ -9,14 +9,14 @@ enum VivienneEdition {
     subtitle: 'Édition Atelier • Chêne, Vachetta & Mini Speedy',
     description:
         'La figurine officielle issue de models/vivienne_speedy_v03.blend : tête en bois de chêne clair, corolle à 4 pétales en cuir Vachetta à tranches rouge carmin, œil fleur Monogram et mini sac Speedy suspendu.',
-    perkLabel: 'Durée Ascension Speedy +25 % & Impulsion Ressort +10 %',
+    perkLabel: 'Durée Ascension Speedy +25 % & Impulsion Ressort +4 %',
     primaryColor: Color(0xFFE3A17B),
     accentColor: Color(0xFFFFD700),
     edgeColor: Color(0xFF8B1E24),
     speedyBoostMultiplier: 1.25,
     magnetRadiusBonus: 0.0,
     scoreMultiplier: 1.0,
-    jumpImpulseMultiplier: 1.04,
+    jumpImpulseMultiplier: 1.02,
   ),
   neoBlossomRose(
     id: 'neo_blossom',
@@ -29,9 +29,9 @@ enum VivienneEdition {
     accentColor: Color(0xFFFFE082),
     edgeColor: Color(0xFFA8243C),
     speedyBoostMultiplier: 1.0,
-    magnetRadiusBonus: 48.0,
+    magnetRadiusBonus: 42.0,
     scoreMultiplier: 1.10,
-    jumpImpulseMultiplier: 1.02,
+    jumpImpulseMultiplier: 1.01,
   ),
   malleImperialeOr(
     id: 'imperiale_or',
@@ -46,7 +46,7 @@ enum VivienneEdition {
     speedyBoostMultiplier: 1.10,
     magnetRadiusBonus: 18.0,
     scoreMultiplier: 1.35,
-    jumpImpulseMultiplier: 1.03,
+    jumpImpulseMultiplier: 1.02,
   ),
   nuitAsnieres(
     id: 'nuit_asnieres',
@@ -54,14 +54,14 @@ enum VivienneEdition {
     subtitle: 'Édition Céleste • Ébène & Constellation Or',
     description:
         'Toile Monogram nuit profonde et surpiqûres sellier lumineuses : maîtrise aérodynamique supérieure lors des fortes inclinaisons du téléphone.',
-    perkLabel: 'Impulsion de saut +12 % & Réactivité Inclinaison +20 %',
+    perkLabel: 'Impulsion de saut +6 % & Réactivité Inclinaison +20 %',
     primaryColor: Color(0xFFC89D7C),
     accentColor: Color(0xFF80D8FF),
     edgeColor: Color(0xFF6A1B9A),
     speedyBoostMultiplier: 1.15,
     magnetRadiusBonus: 24.0,
     scoreMultiplier: 1.15,
-    jumpImpulseMultiplier: 1.12,
+    jumpImpulseMultiplier: 1.06,
   );
 
   const VivienneEdition({
@@ -93,43 +93,67 @@ enum VivienneEdition {
   final double jumpImpulseMultiplier;
 }
 
-/// Vertical altitude realms in the Louis Vuitton ascent universe.
+/// Vertical altitude realms with natural sky, sun, cloud, mountain, hill, and tree palettes.
 enum LvBiome {
   atelierAsnieres(
-    name: 'Atelier d\'Asnières',
-    subtitle: '0 m – 1 500 m • Galerie Bois Clair & Toile Monogram',
+    name: 'Atelier d\'Asnières — Clairière Ensoleillée',
+    subtitle: '0 m – 1 500 m • Ciel Azur, Soleil, Nuages & Forêt Verdoyante',
     minAltitudeMeters: 0,
-    topColor: Color(0xFF281911),
-    bottomColor: Color(0xFF140C08),
-    horizonGlowColor: Color(0xFFD4AF37),
-    accentColor: Color(0xFFE3A17B),
+    topColor: Color(0xFF3A94D8),
+    midSkyColor: Color(0xFF8BD0F6),
+    bottomColor: Color(0xFFFDF3D7),
+    horizonGlowColor: Color(0xFFFFE082),
+    accentColor: Color(0xFFFFD54F),
+    sunColor: Color(0xFFFFF9C4),
+    mountainColor: Color(0xFF6D9AB9),
+    hillColor: Color(0xFF4C8E58),
+    treeCanopyColor: Color(0xFF2D6A3E),
+    treeHighlightColor: Color(0xFF72B856),
   ),
   placeVendome(
     name: 'Place Vendôme — Soleil d\'Or',
-    subtitle: '1 500 m – 3 500 m • Crépuscule Haute Maroquinerie',
+    subtitle: '1 500 m – 3 500 m • Vallée Dorée, Soleil Couchant & Cyprès',
     minAltitudeMeters: 1500,
-    topColor: Color(0xFF3A1D24),
-    bottomColor: Color(0xFF1B0E12),
+    topColor: Color(0xFF395B9E),
+    midSkyColor: Color(0xFFE68A66),
+    bottomColor: Color(0xFFFFE39F),
     horizonGlowColor: Color(0xFFFFB74D),
     accentColor: Color(0xFFFFD700),
+    sunColor: Color(0xFFFFE082),
+    mountainColor: Color(0xFF73628A),
+    hillColor: Color(0xFF5D7242),
+    treeCanopyColor: Color(0xFF354B29),
+    treeHighlightColor: Color(0xFFDCA642),
   ),
   jardinBlossom(
-    name: 'Jardin Céleste Blossom',
-    subtitle: '3 500 m – 6 000 m • Nuée de Fleurs Vachetta & Nacre',
+    name: 'Jardin Céleste Blossom — Vallée Sakura',
+    subtitle: '3 500 m – 6 000 m • Brume Rosée, Cerisiers en Fleurs & Cimes',
     minAltitudeMeters: 3500,
-    topColor: Color(0xFF2C1838),
-    bottomColor: Color(0xFF130A1A),
+    topColor: Color(0xFF46528E),
+    midSkyColor: Color(0xFFC785AE),
+    bottomColor: Color(0xFFFCE2E6),
     horizonGlowColor: Color(0xFFF48FB1),
     accentColor: Color(0xFFFFC1E3),
+    sunColor: Color(0xFFFFF0F5),
+    mountainColor: Color(0xFF6E6796),
+    hillColor: Color(0xFF47695E),
+    treeCanopyColor: Color(0xFF2B4840),
+    treeHighlightColor: Color(0xFFF48FB1),
   ),
   stratosphereStudio(
-    name: 'Stratosphère Studio Cycles',
-    subtitle: '6 000 m+ • Fond Noir Pur #000000 & Constellations Or 24K',
+    name: 'Stratosphère Studio Cycles — Cimes Étoilées',
+    subtitle: '6 000 m+ • Nuit Alpine, Aurore Boréale & Pins Argentés',
     minAltitudeMeters: 6000,
-    topColor: Color(0xFF0A080C),
-    bottomColor: Color(0xFF020203),
+    topColor: Color(0xFF102536),
+    midSkyColor: Color(0xFF224B63),
+    bottomColor: Color(0xFF70BBA9),
     horizonGlowColor: Color(0xFFFFD700),
     accentColor: Color(0xFFFFE57F),
+    sunColor: Color(0xFFFFF9C4),
+    mountainColor: Color(0xFF2B4B61),
+    hillColor: Color(0xFF1E3F3B),
+    treeCanopyColor: Color(0xFF132A28),
+    treeHighlightColor: Color(0xFF64DFDF),
   );
 
   const LvBiome({
@@ -137,18 +161,30 @@ enum LvBiome {
     required this.subtitle,
     required this.minAltitudeMeters,
     required this.topColor,
+    required this.midSkyColor,
     required this.bottomColor,
     required this.horizonGlowColor,
     required this.accentColor,
+    required this.sunColor,
+    required this.mountainColor,
+    required this.hillColor,
+    required this.treeCanopyColor,
+    required this.treeHighlightColor,
   });
 
   final String name;
   final String subtitle;
   final int minAltitudeMeters;
   final Color topColor;
+  final Color midSkyColor;
   final Color bottomColor;
   final Color horizonGlowColor;
   final Color accentColor;
+  final Color sunColor;
+  final Color mountainColor;
+  final Color hillColor;
+  final Color treeCanopyColor;
+  final Color treeHighlightColor;
 
   static LvBiome forAltitude(double meters) {
     if (meters >= 6000) return LvBiome.stratosphereStudio;
@@ -170,15 +206,15 @@ enum LvPlatformType {
   vachettaStrapMoving(
     title: 'Lanière Cuir Vachetta Mobile',
     description:
-        'Lanière en cuir beige rosé à tranche rouge carmin (#8B1E24) et surpiqûre jaune sellier coulissant horizontalement.',
-    impulseMultiplier: 1.05,
+        'Lanière en cuir beige rosé à tranche rouge carmin (#8B1E24) et surpiqûre jaune sellier oscillant autour de son point d\'ancrage.',
+    impulseMultiplier: 1.04,
     singleUse: false,
     movesHorizontally: true,
   ),
   silkBlossomFragile(
     title: 'Pétale de Soie Blossom Éphémère',
     description:
-        'Plateforme délicate ivoire et or qui s\'effeuille en pétales dorés après un rebond.',
+        'Plateforme délicate ivoire et rose qui s\'effeuille en pétales après un rebond.',
     impulseMultiplier: 1.0,
     singleUse: true,
     movesHorizontally: false,
@@ -186,16 +222,16 @@ enum LvPlatformType {
   springLockGold(
     title: 'Malle à Serrure Ressort Or 24K',
     description:
-        'Équipée d\'un fermoir à ressort doré propulsant Vivienne en Grand Saut Célébration (×1.75 hauteur).',
-    impulseMultiplier: 1.75,
+        'Équipée d\'un fermoir à ressort doré propulsant Vivienne en Grand Saut (×1.42 vitesse verticale).',
+    impulseMultiplier: 1.42,
     singleUse: false,
     movesHorizontally: false,
   ),
   damierCloud(
     title: 'Nuage Damier Céleste',
     description:
-        'Plateforme flottante nacrée qui oscille doucement et libère une brume dorée au contact.',
-    impulseMultiplier: 1.18,
+        'Plateforme flottante nacrée qui oscille doucement et offre un rebond aérien.',
+    impulseMultiplier: 1.08,
     singleUse: false,
     movesHorizontally: true,
   );
@@ -305,22 +341,29 @@ enum BlossomItemType {
   final Color secondaryColor;
 }
 
-/// Active platform instance in the vertical world.
+/// Active platform instance in the deterministic seeded vertical world.
 class LvPlatform {
   LvPlatform({
     required this.id,
+    required this.stepIndex,
     required this.x,
     required this.y,
     required this.width,
     required this.height,
     required this.type,
+    double? anchorX,
+    this.patrolRadius = 0.0,
     this.vx = 0.0,
     this.broken = false,
     this.bounceCompress = 0.0,
     this.hasSpringTriggered = false,
-  });
+    this.hasBonusItem = false,
+  }) : anchorX = anchorX ?? x;
 
   final int id;
+  final int stepIndex;
+  final double anchorX;
+  final double patrolRadius;
   double x;
   double y;
   final double width;
@@ -330,6 +373,7 @@ class LvPlatform {
   bool broken;
   double bounceCompress;
   bool hasSpringTriggered;
+  final bool hasBonusItem;
 }
 
 /// Collectible Blossom Flower or LV Maison power-up floating above platforms.
@@ -339,7 +383,7 @@ class BlossomCollectible {
     required this.x,
     required this.y,
     required this.type,
-    this.radius = 20.0,
+    this.radius = 15.0,
     this.phase = 0.0,
     this.collected = false,
   });
@@ -360,7 +404,7 @@ class LvAtelierHazard {
     required this.x,
     required this.y,
     required this.vx,
-    this.radius = 24.0,
+    this.radius = 22.0,
     this.phase = 0.0,
   });
 
