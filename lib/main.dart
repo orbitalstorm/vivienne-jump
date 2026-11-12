@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import 'engine/vivienne_jump_engine.dart';
 import 'models/vivienne_models.dart';
+import 'painters/vivienne_cartoon_assets.dart';
 import 'painters/vivienne_game_painter.dart';
 
 Future<void> main() async {
@@ -19,7 +20,7 @@ Future<void> main() async {
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
-      systemNavigationBarColor: Color(0xFF0E1D14),
+      systemNavigationBarColor: Color(0xFF2B1105),
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
@@ -53,8 +54,10 @@ void triggerGameHaptic(GameHapticKind kind) {
   }
 }
 
-/// Reusable tactile 3D game button implementing `mobile-game-ui` (Mode B Flutter):
-/// - Immediate Squash & Stretch on contact (`AnimatedScale` 0.93, `Curves.easeOutCubic`, 75ms)
+/// Reusable tactile 3D Cartoon Candy button implementing `mobile-game-ui` (Mode B Flutter):
+/// - Immediate Squash & Stretch on contact (`AnimatedScale` 0.92, elastic release)
+/// - Thick cartoon outline (`#2B1105`, `borderWidth: 2.6`)
+/// - Top glossy white specular highlight bar (`gloss highlight`)
 /// - Tactile 3D bottom lip (`BoxShadow` with `blurRadius: 0` reduced on press + vertical translation)
 /// - Native Haptic Feedback (`HapticFeedback`)
 /// - Enforced minimum touch target constraints (`ConstrainedBox`).
@@ -64,10 +67,11 @@ class Juicy3DGameButton extends StatefulWidget {
     required this.onTap,
     required this.child,
     this.backgroundColor = const Color(0xFFFFD700),
-    this.lipColor = const Color(0xFF9E6B14),
-    this.borderColor = const Color(0xFFFFFFFF),
-    this.borderRadius = 16.0,
-    this.lipDepth = 4.0,
+    this.lipColor = const Color(0xFFBF6000),
+    this.borderColor = const Color(0xFF2B1105),
+    this.borderWidth = 2.6,
+    this.borderRadius = 22.0,
+    this.lipDepth = 5.5,
     this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
     this.minWidth = 48.0,
     this.minHeight = 48.0,
@@ -79,6 +83,7 @@ class Juicy3DGameButton extends StatefulWidget {
   final Color backgroundColor;
   final Color lipColor;
   final Color borderColor;
+  final double borderWidth;
   final double borderRadius;
   final double lipDepth;
   final EdgeInsetsGeometry padding;
@@ -135,19 +140,18 @@ class _Juicy3DGameButtonState extends State<Juicy3DGameButton> {
           minHeight: widget.minHeight,
         ),
         child: AnimatedScale(
-          scale: _isPressed ? 0.93 : 1.0,
-          duration: const Duration(milliseconds: 75),
-          curve: Curves.easeOutCubic,
+          scale: _isPressed ? 0.92 : 1.0,
+          duration: Duration(milliseconds: _isPressed ? 70 : 180),
+          curve: _isPressed ? Curves.easeOutCubic : Curves.elasticOut,
           child: Transform.translate(
             offset: Offset(0, translateY),
             child: Container(
-              padding: widget.padding,
               decoration: BoxDecoration(
                 color: widget.backgroundColor,
                 borderRadius: BorderRadius.circular(widget.borderRadius),
                 border: Border.all(
                   color: widget.borderColor,
-                  width: 1.2,
+                  width: widget.borderWidth,
                 ),
                 boxShadow: <BoxShadow>[
                   if (currentLip > 0)
@@ -156,16 +160,225 @@ class _Juicy3DGameButtonState extends State<Juicy3DGameButton> {
                       blurRadius: 0,
                       offset: Offset(0, currentLip),
                     ),
+                  if (currentLip > 0)
+                    BoxShadow(
+                      color: const Color(0x552B1105),
+                      blurRadius: 4,
+                      offset: Offset(0, currentLip + 2.0),
+                    ),
                 ],
               ),
-              alignment: Alignment.center,
-              child: widget.child,
+              child: Stack(
+                alignment: Alignment.center,
+                children: <Widget>[
+                  // Top Cartoon Glossy Specular Highlight
+                  Positioned(
+                    top: 2.5,
+                    left: 10,
+                    right: 10,
+                    height: 5.5,
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.45),
+                          borderRadius: BorderRadius.circular(99),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: widget.padding,
+                    child: widget.child,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
+}
+
+/// Bouncy Cartoon Modal Wrapper (`Curves.elasticOut`) for Angry Birds / Candy Crush feel.
+class CartoonBouncyModal extends StatelessWidget {
+  const CartoonBouncyModal({
+    super.key,
+    required this.child,
+    this.backgroundColor = const Color(0xFFFFF8E7),
+    this.borderColor = const Color(0xFF2B1105),
+    this.lipColor = const Color(0xFF4A1800),
+    this.borderRadius = 28.0,
+    this.lipDepth = 6.5,
+    this.padding = const EdgeInsets.all(12),
+  });
+
+  final Widget child;
+  final Color backgroundColor;
+  final Color borderColor;
+  final Color lipColor;
+  final double borderRadius;
+  final double lipDepth;
+  final EdgeInsetsGeometry padding;
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(
+      child: TweenAnimationBuilder<double>(
+        tween: Tween<double>(begin: 0.90, end: 1.0),
+        duration: const Duration(milliseconds: 210),
+        curve: Curves.elasticOut,
+        builder: (BuildContext context, double scale, Widget? content) {
+          return Transform.scale(
+            scale: scale,
+            child: content,
+          );
+        },
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(borderRadius),
+            border: Border.all(
+              color: borderColor,
+              width: 3.2,
+            ),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: lipColor,
+                blurRadius: 0,
+                offset: Offset(0, lipDepth),
+              ),
+              BoxShadow(
+                color: const Color(0x66000000),
+                blurRadius: 12,
+                offset: Offset(0, lipDepth + 4),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
+/// Purely visual particle effect pill for the Herbarium platform cards (no text description).
+class CartoonParticleEffectVisualPill extends StatelessWidget {
+  const CartoonParticleEffectVisualPill({
+    super.key,
+    required this.platformType,
+  });
+
+  final LvPlatformType platformType;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 68,
+      height: 28,
+      decoration: BoxDecoration(
+        color: const Color(0xFF2B1105),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: platformType.accentColor,
+          width: 2.0,
+        ),
+      ),
+      child: CustomPaint(
+        painter: _PlatformParticlePreviewPainter(platformType: platformType),
+      ),
+    );
+  }
+}
+
+class _PlatformParticlePreviewPainter extends CustomPainter {
+  const _PlatformParticlePreviewPainter({required this.platformType});
+
+  final LvPlatformType platformType;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Offset c = Offset(size.width * 0.5, size.height * 0.5);
+    switch (platformType) {
+      case LvPlatformType.monogramTrunk:
+        // Brass 4-point diamond sparks
+        for (final Offset offset in <Offset>[
+          const Offset(-16, 2),
+          const Offset(0, -3),
+          const Offset(16, 2),
+        ]) {
+          _drawDiamondSpark(
+            canvas,
+            c + offset,
+            5.5,
+            const Color(0xFFFFD700),
+          );
+        }
+      case LvPlatformType.springLockGold:
+        // Ascending 24K gold stars + updraft lines
+        final Paint linePaint = Paint()
+          ..color = const Color(0xFFFFF59D)
+          ..strokeWidth = 2.0
+          ..strokeCap = StrokeCap.round;
+        canvas.drawLine(c + const Offset(-14, 7), c + const Offset(-14, -5), linePaint);
+        canvas.drawLine(c + const Offset(14, 7), c + const Offset(14, -5), linePaint);
+        _drawDiamondSpark(canvas, c + const Offset(0, -2), 7.0, const Color(0xFFFFD700));
+        _drawDiamondSpark(canvas, c + const Offset(-14, -6), 4.5, const Color(0xFFFFF59D));
+        _drawDiamondSpark(canvas, c + const Offset(14, -6), 4.5, const Color(0xFFFFF59D));
+      case LvPlatformType.damierCloud:
+        // Soft cushioned cloud puffs
+        final Paint puffPaint = Paint()..color = const Color(0xFFB3E5FC);
+        final Paint whitePaint = Paint()..color = Colors.white;
+        canvas.drawCircle(c + const Offset(-14, 2), 6.0, puffPaint);
+        canvas.drawCircle(c + const Offset(14, 2), 6.0, puffPaint);
+        canvas.drawCircle(c + const Offset(0, -1), 7.5, whitePaint);
+      case LvPlatformType.silkBlossomFragile:
+        // Fluttering silk petals
+        final Paint petalPaint = Paint()..color = const Color(0xFFF48FB1);
+        for (final Offset offset in <Offset>[
+          const Offset(-15, -2),
+          const Offset(0, 3),
+          const Offset(15, -1),
+        ]) {
+          canvas.save();
+          canvas.translate(c.dx + offset.dx, c.dy + offset.dy);
+          canvas.rotate(offset.dx * 0.04);
+          canvas.drawOval(
+            Rect.fromCenter(center: Offset.zero, width: 9.0, height: 5.5),
+            petalPaint,
+          );
+          canvas.restore();
+        }
+      case LvPlatformType.vachettaStrapMoving:
+        // Sleek horizontal velocity streaks
+        final Paint trailPaint = Paint()
+          ..color = const Color(0xFFE3A17B)
+          ..strokeWidth = 2.8
+          ..strokeCap = StrokeCap.round;
+        final Paint goldTrail = Paint()
+          ..color = const Color(0xFFFFD700)
+          ..strokeWidth = 2.2
+          ..strokeCap = StrokeCap.round;
+        canvas.drawLine(c + const Offset(-20, -4), c + const Offset(12, -4), trailPaint);
+        canvas.drawLine(c + const Offset(-12, 1), c + const Offset(20, 1), goldTrail);
+        canvas.drawLine(c + const Offset(-18, 6), c + const Offset(8, 6), trailPaint);
+    }
+  }
+
+  void _drawDiamondSpark(Canvas canvas, Offset center, double r, Color color) {
+    final Path path = Path()
+      ..moveTo(center.dx, center.dy - r)
+      ..lineTo(center.dx + r * 0.65, center.dy)
+      ..lineTo(center.dx, center.dy + r)
+      ..lineTo(center.dx - r * 0.65, center.dy)
+      ..close();
+    canvas.drawPath(path, Paint()..color = color);
+  }
+
+  @override
+  bool shouldRepaint(covariant _PlatformParticlePreviewPainter oldDelegate) =>
+      oldDelegate.platformType != platformType;
 }
 
 /// Isolated interpolated numerical ticker wrapped in a `RepaintBoundary`
@@ -219,13 +432,13 @@ class VivienneJumpApp extends StatelessWidget {
       title: 'VIVIENNE : L\'Odyssée Blossom',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.dark,
+        brightness: Brightness.light,
         fontFamily: 'Roboto',
-        scaffoldBackgroundColor: const Color(0xFF1A4B6E),
-        colorScheme: const ColorScheme.dark(
+        scaffoldBackgroundColor: const Color(0xFF29B6F6),
+        colorScheme: const ColorScheme.light(
           primary: Color(0xFFFFD700),
-          secondary: Color(0xFFE3A17B),
-          surface: Color(0xFF12241B),
+          secondary: Color(0xFFFF4081),
+          surface: Color(0xFFFFF8E7),
         ),
         useMaterial3: true,
       ),
@@ -388,7 +601,7 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A4B6E),
+      backgroundColor: const Color(0xFF29B6F6),
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: ListenableBuilder(
@@ -403,42 +616,42 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                   ),
                 ),
 
-                // 2. Minimalist Floating Top HUD
+                // 2. Cartoon Floating Top HUD (without platform description banner)
                 Positioned(
                   top: 8,
-                  left: 12,
-                  right: 12,
+                  left: 10,
+                  right: 10,
                   child: _buildMinimalFloatingTopHud(),
                 ),
 
-                // 3. Secondary Minimalist Modal Panels
+                // 3. Secondary Cartoon Candy Modal Panels
                 if (_activeTab == VivienneNavTab.editionsAndBiomes)
                   Positioned.fill(
-                    top: 94,
-                    bottom: 62,
+                    top: 80,
+                    bottom: 66,
                     child: _buildEditionsAndBiomesPanel(),
                   ),
                 if (_activeTab == VivienneNavTab.blossomHerbarium)
                   Positioned.fill(
-                    top: 94,
-                    bottom: 62,
+                    top: 80,
+                    bottom: 66,
                     child: _buildBlossomHerbariumPanel(),
                   ),
                 if (_activeTab == VivienneNavTab.blenderAtelier)
                   Positioned.fill(
-                    top: 94,
-                    bottom: 62,
+                    top: 80,
+                    bottom: 66,
                     child: _buildBlenderAtelierPanel(),
                   ),
 
-                // 4. Pre-Game Store Menu & Seed Leaderboard Overlay (`engine.isInMenu`)
+                // 4. Pre-Game Cartoon Menu & Seed Leaderboard Overlay (`engine.isInMenu`)
                 if (_engine.isInMenu &&
                     _activeTab == VivienneNavTab.ascension)
                   Positioned.fill(
                     child: _buildMainMenuOverlay(),
                   ),
 
-                // 5. Enriched Game Over & Seed Leaderboard Overlay (`engine.isGameOver`)
+                // 5. Enriched Cartoon Game Over & Seed Leaderboard Overlay (`engine.isGameOver`)
                 if (_engine.isGameOver &&
                     !_engine.isInMenu &&
                     _activeTab == VivienneNavTab.ascension)
@@ -446,10 +659,10 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                     child: _buildGameOverOverlay(),
                   ),
 
-                // 6. Thumb-Zone Bottom Control Bar & Navigation Bar
+                // 6. Thumb-Zone Bottom Control Bar & Cartoon Navigation Bar
                 Positioned(
-                  left: 12,
-                  right: 12,
+                  left: 10,
+                  right: 10,
                   bottom: 8,
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -473,33 +686,40 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
     );
   }
 
+  /// Cartoon Top HUD without any platform description banner.
   Widget _buildMinimalFloatingTopHud() {
     final double normTilt = _engine.effectiveTiltX.clamp(-1.0, 1.0);
     final double deg = _engine.tiltAngleDegrees;
     final String tiltLabel =
         '${deg >= 0 ? '+' : ''}${deg.toStringAsFixed(0)}°';
-    final LvPlatformType activePlat = _engine.lastBouncedPlatformType;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        // Top Floating Row: Score/Altitude Pill (left) + Seed, Menu/Scores & Combo Pills (right)
+        // Top Floating Row: Cartoon Score/Altitude Pill (left) + Seed, Scores & Combo Pills (right)
         Row(
           children: <Widget>[
             Expanded(
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
+                  horizontal: 9,
+                  vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xAA0D1F2D),
-                  borderRadius: BorderRadius.circular(20),
+                  color: const Color(0xFFFFF8E7),
+                  borderRadius: BorderRadius.circular(22),
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.24),
-                    width: 1.0,
+                    color: const Color(0xFF2B1105),
+                    width: 2.5,
                   ),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(
+                      color: Color(0xFF4A1800),
+                      blurRadius: 0,
+                      offset: Offset(0, 3.5),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: <Widget>[
@@ -507,10 +727,11 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                       width: 24,
                       height: 24,
                       decoration: BoxDecoration(
+                        color: const Color(0xFFFFD700),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: const Color(0xFFFFD700),
-                          width: 1.2,
+                          color: const Color(0xFF2B1105),
+                          width: 1.8,
                         ),
                       ),
                       child: ClipOval(
@@ -524,33 +745,32 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                               )
                             : const Icon(
                                 Icons.auto_awesome,
-                                color: Color(0xFFFFD700),
+                                color: Color(0xFF2B1105),
                                 size: 14,
                               ),
                       ),
                     ),
-                    const SizedBox(width: 7),
+                    const SizedBox(width: 6),
                     InterpolatedHudTicker(
                       value: _engine.altitudeMeters,
                       formatter: (double v) => '${v.toStringAsFixed(0)} m',
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.5,
+                        color: Color(0xFF2B1105),
+                        fontSize: 13.5,
                         fontWeight: FontWeight.w900,
-                        letterSpacing: 0.3,
+                        letterSpacing: 0.2,
                       ),
                     ),
-                    const SizedBox(width: 7),
+                    const SizedBox(width: 6),
                     Container(
-                      width: 1,
+                      width: 2,
                       height: 12,
-                      color: Colors.white24,
+                      color: const Color(0x332B1105),
                     ),
-                    const SizedBox(width: 7),
-                    const Icon(
-                      Icons.local_florist,
-                      size: 12,
-                      color: Color(0xFFF8BBD0),
+                    const SizedBox(width: 6),
+                    const CartoonEmblemBadge(
+                      kind: CartoonEmblemKind.blossomStar,
+                      size: 14,
                     ),
                     const SizedBox(width: 4),
                     Flexible(
@@ -559,9 +779,9 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                         formatter: (double v) =>
                             '${_engine.runBlossomsCollected} • ${v.round()} pts • VIVIENNE',
                         style: const TextStyle(
-                          color: Color(0xFFFFF59D),
-                          fontSize: 10.0,
-                          fontWeight: FontWeight.w800,
+                          color: Color(0xFFD81B60),
+                          fontSize: 9.8,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
                     ),
@@ -570,7 +790,7 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
               ),
             ),
             const SizedBox(width: 5),
-            // Deterministic Seed Pill (Tappable)
+            // Deterministic Seed Pill (Tappable Cartoon Sky Pill)
             GestureDetector(
               key: const Key('seed_cycle_button'),
               onTap: () {
@@ -581,15 +801,22 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 8,
-                  vertical: 7,
+                  vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xAA0D1F2D),
-                  borderRadius: BorderRadius.circular(16),
+                  color: const Color(0xFF29B6F6),
+                  borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: const Color(0xAAFFD700),
-                    width: 1.0,
+                    color: const Color(0xFF2B1105),
+                    width: 2.3,
                   ),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(
+                      color: Color(0xFF0277BD),
+                      blurRadius: 0,
+                      offset: Offset(0, 3.0),
+                    ),
+                  ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -597,7 +824,7 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                     const Icon(
                       Icons.tag,
                       size: 11,
-                      color: Color(0xFFFFD700),
+                      color: Color(0xFFFFF8E7),
                     ),
                     const SizedBox(width: 2),
                     Text(
@@ -614,7 +841,7 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
               ),
             ),
             const SizedBox(width: 5),
-            // Store Menu & Seed Leaderboard Button
+            // Store Menu & Seed Leaderboard Button with Cartoon Trophy Emblem
             GestureDetector(
               key: const Key('open_menu_leaderboard_button'),
               onTap: () {
@@ -628,29 +855,35 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 8,
-                  vertical: 7,
+                  vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xDD162E22),
-                  borderRadius: BorderRadius.circular(16),
+                  color: const Color(0xFFFFD700),
+                  borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: const Color(0xFFFFD700),
-                    width: 1.1,
+                    color: const Color(0xFF2B1105),
+                    width: 2.3,
                   ),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(
+                      color: Color(0xFFBF6000),
+                      blurRadius: 0,
+                      offset: Offset(0, 3.0),
+                    ),
+                  ],
                 ),
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Icon(
-                      Icons.emoji_events,
-                      size: 12,
-                      color: Color(0xFFFFD700),
+                    CartoonEmblemBadge(
+                      kind: CartoonEmblemKind.trophyCup,
+                      size: 15,
                     ),
                     SizedBox(width: 3),
                     Text(
                       'SCORES',
                       style: TextStyle(
-                        color: Color(0xFFFFD700),
+                        color: Color(0xFF2B1105),
                         fontSize: 9.0,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.3,
@@ -665,17 +898,20 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 7,
-                  vertical: 6,
+                  vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xCC8B1E24),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: const Color(0xFFFFD700)),
+                  color: const Color(0xFFFF4081),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFF2B1105),
+                    width: 2.2,
+                  ),
                 ),
                 child: Text(
                   '×${_engine.comboCount}',
                   style: const TextStyle(
-                    color: Color(0xFFFFF59D),
+                    color: Colors.white,
                     fontSize: 9.5,
                     fontWeight: FontWeight.w900,
                   ),
@@ -684,33 +920,40 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
             ],
           ],
         ),
-        const SizedBox(height: 5),
-        // Second Compact Row: Minimalist Inclinometer & 0° Calibration Pill
+        const SizedBox(height: 6),
+        // Second Compact Row: Cartoon Inclinometer & 0° Calibration Pill
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: const Color(0x780D1F2D),
-            borderRadius: BorderRadius.circular(14),
+            color: const Color(0xEEFFF8E7),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.16),
-              width: 0.8,
+              color: const Color(0xFF2B1105),
+              width: 2.0,
             ),
+            boxShadow: const <BoxShadow>[
+              BoxShadow(
+                color: Color(0x552B1105),
+                blurRadius: 0,
+                offset: Offset(0, 2.5),
+              ),
+            ],
           ),
           child: Row(
             children: <Widget>[
               const Icon(
                 Icons.screen_rotation_alt,
-                size: 12,
-                color: Color(0xFFFFE082),
+                size: 13,
+                color: Color(0xFFD81B60),
               ),
               const SizedBox(width: 5),
               Text(
                 'INCLINAISON $tiltLabel',
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF2B1105),
                   fontSize: 9.0,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.4,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 0.3,
                 ),
               ),
               const SizedBox(width: 8),
@@ -719,9 +962,9 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                   builder: (BuildContext context, BoxConstraints constraints) {
                     final double barW = constraints.maxWidth;
                     final double knobX =
-                        ((normTilt + 1.0) * 0.5 * (barW - 14.0)).clamp(
+                        ((normTilt + 1.0) * 0.5 * (barW - 16.0)).clamp(
                           0.0,
-                          math.max(0.0, barW - 14.0),
+                          math.max(0.0, barW - 16.0),
                         );
                     return GestureDetector(
                       behavior: HitTestBehavior.opaque,
@@ -738,27 +981,35 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                         _engine.setManualTilt(rel);
                       },
                       child: Container(
-                        height: 10,
+                        height: 11,
                         decoration: BoxDecoration(
-                          color: const Color(0x55000000),
-                          borderRadius: BorderRadius.circular(5),
+                          color: const Color(0xFFFFE0B2),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: const Color(0xFF2B1105),
+                            width: 1.4,
+                          ),
                         ),
                         child: Stack(
                           alignment: Alignment.center,
                           children: <Widget>[
                             Container(
-                              width: 1.5,
+                              width: 2.0,
                               height: 8,
-                              color: Colors.white38,
+                              color: const Color(0x662B1105),
                             ),
                             Positioned(
                               left: knobX,
                               child: Container(
-                                width: 14,
-                                height: 8,
+                                width: 16,
+                                height: 9,
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFFFFD700),
-                                  borderRadius: BorderRadius.circular(4),
+                                  color: const Color(0xFFFF4081),
+                                  borderRadius: BorderRadius.circular(5),
+                                  border: Border.all(
+                                    color: const Color(0xFF2B1105),
+                                    width: 1.2,
+                                  ),
                                 ),
                               ),
                             ),
@@ -781,15 +1032,19 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.14),
+                    color: const Color(0xFFFFD700),
                     borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color(0xFF2B1105),
+                      width: 1.4,
+                    ),
                   ),
                   child: const Text(
                     'CALIBRER 0°',
                     style: TextStyle(
-                      color: Color(0xFFFFE082),
-                      fontSize: 8.5,
-                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF2B1105),
+                      fontSize: 8.2,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                 ),
@@ -797,62 +1052,6 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
             ],
           ),
         ),
-        // Third Compact Row: Instant 5-Platform Visual Legend & Active Bounce Status
-        if (_activeTab == VivienneNavTab.ascension && !_engine.isInMenu)
-          Padding(
-            padding: const EdgeInsets.only(top: 4),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3.5),
-              decoration: BoxDecoration(
-                color: const Color(0x8809151E),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: activePlat.accentColor.withValues(alpha: 0.55),
-                  width: 0.9,
-                ),
-              ),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 1.5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: activePlat.accentColor.withValues(alpha: 0.22),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(
-                        color: activePlat.accentColor,
-                        width: 0.8,
-                      ),
-                    ),
-                    child: Text(
-                      activePlat.badgeText,
-                      style: TextStyle(
-                        color: activePlat.accentColor,
-                        fontSize: 8.0,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      _engine.perfectBounceStreak > 0
-                          ? 'PARFAIT ×${_engine.perfectBounceStreak} • ${activePlat.shortEffectLabel}'
-                          : 'RECORD SEED #${_engine.seed}: ${_engine.currentSeedHighScore} pts • ${activePlat.shortEffectLabel}',
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 8.2,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
         // Active power-up chips (only shown on main Ascension playfield)
         if (_activeTab == VivienneNavTab.ascension &&
             !_engine.isInMenu &&
@@ -873,12 +1072,12 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                 if (_engine.padlockShieldTimer > 0)
                   _buildBuffChip(
                     'CADENAS ${_engine.padlockShieldTimer.toStringAsFixed(1)}s',
-                    const Color(0xFFFFE082),
+                    const Color(0xFF76FF03),
                   ),
                 if (_engine.magnetTimer > 0)
                   _buildBuffChip(
                     'AIMANT ${_engine.magnetTimer.toStringAsFixed(1)}s',
-                    const Color(0xFFF8BBD0),
+                    const Color(0xFFFF80AB),
                   ),
               ],
             ),
@@ -931,14 +1130,14 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xAA0D1F2D),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: 0.85)),
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF2B1105), width: 2.0),
       ),
       child: Text(
         text,
-        style: TextStyle(
-          color: color,
+        style: const TextStyle(
+          color: Color(0xFF2B1105),
           fontSize: 8.5,
           fontWeight: FontWeight.w900,
         ),
@@ -964,17 +1163,15 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
             minHeight: 48.0,
             haptic: ready ? GameHapticKind.heavy : GameHapticKind.light,
             backgroundColor: ready
-                ? const Color(0xFFFFD700)
-                : const Color(0xCC0D1F2D),
+                ? const Color(0xFF76FF03)
+                : const Color(0xFFFFF8E7),
             lipColor: ready
-                ? const Color(0xFF9E6B14)
-                : const Color(0xFF061018),
-            borderColor: ready
-                ? const Color(0xFFFFFFFF)
-                : Colors.white.withValues(alpha: 0.28),
-            borderRadius: 18.0,
-            lipDepth: 4.5,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                ? const Color(0xFF33691E)
+                : const Color(0xFF8D6E63),
+            borderColor: const Color(0xFF2B1105),
+            borderRadius: 22.0,
+            lipDepth: 5.0,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             onTap: _engine.triggerGrandBlossomLeap,
             child: RepaintBoundary(
               child: TweenAnimationBuilder<double>(
@@ -985,25 +1182,20 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      Icon(
-                        Icons.bolt,
-                        size: 15,
-                        color: ready
-                            ? const Color(0xFF102419)
-                            : const Color(0xFFFFD700),
+                      const CartoonEmblemBadge(
+                        kind: CartoonEmblemKind.blossomStar,
+                        size: 16,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 5),
                       Flexible(
                         child: Text(
                           'ÉCLAT BLOSSOM ${(animGauge * 100).round()}%',
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: ready
-                                ? const Color(0xFF102419)
-                                : Colors.white,
+                          style: const TextStyle(
+                            color: Color(0xFF2B1105),
                             fontSize: 10.0,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 0.5,
+                            letterSpacing: 0.4,
                           ),
                         ),
                       ),
@@ -1030,26 +1222,26 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
     required VoidCallback onTap,
   }) {
     return Juicy3DGameButton(
-      minWidth: 68.0,
+      minWidth: 70.0,
       minHeight: 48.0,
-      backgroundColor: const Color(0xCC0D1F2D),
-      lipColor: const Color(0xFF050E15),
-      borderColor: Colors.white.withValues(alpha: 0.28),
-      borderRadius: 16.0,
-      lipDepth: 4.0,
+      backgroundColor: const Color(0xFF29B6F6),
+      lipColor: const Color(0xFF0277BD),
+      borderColor: const Color(0xFF2B1105),
+      borderRadius: 20.0,
+      lipDepth: 5.0,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       onTap: onTap,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Icon(icon, size: 15, color: Colors.white),
+          Icon(icon, size: 16, color: Colors.white),
           const SizedBox(width: 2),
           Text(
             label,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 8.5,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w900,
             ),
           ),
         ],
@@ -1061,33 +1253,44 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
       decoration: BoxDecoration(
-        color: const Color(0xCC0B1912),
-        borderRadius: BorderRadius.circular(22),
+        color: const Color(0xFFFFF8E7),
+        borderRadius: BorderRadius.circular(26),
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.18),
-          width: 1.0,
+          color: const Color(0xFF2B1105),
+          width: 3.0,
         ),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(
+            color: Color(0xFF4A1800),
+            blurRadius: 0,
+            offset: Offset(0, 5.0),
+          ),
+        ],
       ),
       child: Row(
         children: <Widget>[
           _buildNavTabButton(
             tab: VivienneNavTab.ascension,
-            icon: Icons.north,
+            emblem: CartoonEmblemKind.playTriangle,
+            activeColor: const Color(0xFF76FF03),
             label: 'ASCENSION',
           ),
           _buildNavTabButton(
             tab: VivienneNavTab.editionsAndBiomes,
-            icon: Icons.wb_sunny_outlined,
+            emblem: CartoonEmblemKind.crownEdition,
+            activeColor: const Color(0xFFFFD700),
             label: 'MAISON LV',
           ),
           _buildNavTabButton(
             tab: VivienneNavTab.blossomHerbarium,
-            icon: Icons.local_florist_outlined,
+            emblem: CartoonEmblemKind.blossomStar,
+            activeColor: const Color(0xFFFF80AB),
             label: 'HERBIER',
           ),
           _buildNavTabButton(
             tab: VivienneNavTab.blenderAtelier,
-            icon: Icons.view_in_ar,
+            emblem: CartoonEmblemKind.cube3DStudio,
+            activeColor: const Color(0xFF29B6F6),
             label: 'BLENDER 3D',
           ),
         ],
@@ -1097,7 +1300,8 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
 
   Widget _buildNavTabButton({
     required VivienneNavTab tab,
-    required IconData icon,
+    required CartoonEmblemKind emblem,
+    required Color activeColor,
     required String label,
   }) {
     final bool selected = _activeTab == tab;
@@ -1105,162 +1309,343 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () => _selectTab(tab),
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 2),
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          decoration: BoxDecoration(
-            color: selected
-                ? const Color(0x33FFD700)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: selected
-                  ? const Color(0xFFFFD700)
-                  : Colors.transparent,
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Icon(
-                icon,
-                size: 13,
-                color: selected
-                    ? const Color(0xFFFFD700)
-                    : Colors.white70,
+        child: AnimatedScale(
+          scale: selected ? 1.04 : 1.0,
+          duration: const Duration(milliseconds: 160),
+          curve: Curves.elasticOut,
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 2),
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+            decoration: BoxDecoration(
+              color: selected ? activeColor : const Color(0xFFFFE0B2),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: const Color(0xFF2B1105),
+                width: selected ? 2.2 : 1.4,
               ),
-              const SizedBox(width: 4),
-              Flexible(
-                child: Text(
-                  label,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: selected
-                        ? const Color(0xFFFFD700)
-                        : Colors.white70,
-                    fontSize: 9.0,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.3,
+              boxShadow: selected
+                  ? const <BoxShadow>[
+                      BoxShadow(
+                        color: Color(0xFF4A1800),
+                        blurRadius: 0,
+                        offset: Offset(0, 2.5),
+                      ),
+                    ]
+                  : const <BoxShadow>[],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                CartoonEmblemBadge(
+                  kind: emblem,
+                  size: 14,
+                ),
+                const SizedBox(width: 3),
+                Flexible(
+                  child: Text(
+                    label,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: Color(0xFF2B1105),
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.2,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  /// Store Launch Menu Overlay (`engine.isInMenu`) featuring:
-  /// - Seed Selector + Custom Seed Input
-  /// - Full Seed Leaderboard ("TABLEAU DES SCORES PAR SEED") with "REJOUER CE SEED"
-  /// - 5 Differentiated Platforms Guide
-  /// - 3D Tactile "LANCER L'ASCENSION" CTA
+  /// Cartoon Pop Main Menu Overlay (`engine.isInMenu`) inspired by Angry Birds / Candy Crush:
+  /// - Joyful Cartoon Ribbon Banner (`VIVIENNE JUMP — SALON DES SCORES & SEEDS`)
+  /// - Huge 3D Cartoon Green/Gold Play CTA (`start_run_from_menu_button`)
+  /// - Big Cartoon Quick-Access Buttons to sub-menus
+  /// - Candy Crush / Angry Birds Level-Style Seed Leaderboard (`TABLEAU DES SCORES PAR SEED`)
+  /// - Deterministic Seed Selector & Input (`custom_seed_input`, `apply_custom_seed_button`)
+  /// - Platform descriptions completely hidden!
   Widget _buildMainMenuOverlay() {
     return Container(
       key: const Key('main_menu_overlay'),
-      color: const Color(0xCC07120D),
-      padding: const EdgeInsets.fromLTRB(12, 82, 12, 64),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xF410231A),
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: const Color(0xFFFFD700), width: 1.8),
-        ),
+      color: const Color(0x88102A43),
+      padding: const EdgeInsets.fromLTRB(10, 76, 10, 66),
+      child: CartoonBouncyModal(
+        backgroundColor: const Color(0xFFFFF8E7),
+        borderColor: const Color(0xFF2B1105),
+        lipColor: const Color(0xFF4A1800),
+        borderRadius: 28,
+        lipDepth: 7.0,
+        padding: const EdgeInsets.all(12),
         child: ListView(
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF0A1610),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFFFD700)),
-                  ),
-                  child: _blenderSprites[VivienneBlenderPose.pose5GrandApex] !=
-                          null
-                      ? RawImage(
-                          image: _blenderSprites[
-                              VivienneBlenderPose.pose5GrandApex],
-                          fit: BoxFit.contain,
-                        )
-                      : const Icon(
-                          Icons.emoji_events,
-                          color: Color(0xFFFFD700),
-                        ),
+            // 1. Cartoon Ribbon Header with Bouncing Vivienne Mascot
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: <Color>[Color(0xFFFF4081), Color(0xFFFF80AB)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      const Text(
-                        'VIVIENNE JUMP — SALON DES SCORES & SEEDS',
-                        style: TextStyle(
-                          color: Color(0xFFFFD700),
-                          fontSize: 13.0,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      Text(
-                        'Seed Actif #${_engine.seed} • Record à battre : ${_engine.currentSeedHighScore} pts (${_engine.bestAltitudeForSeed(_engine.seed)} m)',
-                        style: const TextStyle(
-                          color: Color(0xFFFFE082),
-                          fontSize: 10.0,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(
+                  color: const Color(0xFF2B1105),
+                  width: 2.8,
                 ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            // Primary 3D CTA to start/resume on current seed
-            Juicy3DGameButton(
-              key: const Key('start_run_from_menu_button'),
-              minHeight: 48.0,
-              haptic: GameHapticKind.heavy,
-              backgroundColor: const Color(0xFFFFD700),
-              lipColor: const Color(0xFF9E6B14),
-              borderColor: const Color(0xFFFFFFFF),
-              borderRadius: 16.0,
-              lipDepth: 5.0,
-              onTap: () => _engine.startRunFromMenu(targetSeed: _engine.seed),
+                boxShadow: const <BoxShadow>[
+                  BoxShadow(
+                    color: Color(0xFF880E4F),
+                    blurRadius: 0,
+                    offset: Offset(0, 4.0),
+                  ),
+                ],
+              ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const Icon(
-                    Icons.play_arrow_rounded,
-                    color: Color(0xFF0E1E16),
-                    size: 20,
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(begin: 0.88, end: 1.0),
+                    duration: const Duration(milliseconds: 240),
+                    curve: Curves.elasticOut,
+                    builder: (BuildContext context, double s, Widget? child) {
+                      return Transform.scale(scale: s, child: child);
+                    },
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFF8E7),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFF2B1105),
+                          width: 2.4,
+                        ),
+                      ),
+                      child: _blenderSprites[
+                                  VivienneBlenderPose.pose5GrandApex] !=
+                              null
+                          ? RawImage(
+                              image: _blenderSprites[
+                                  VivienneBlenderPose.pose5GrandApex],
+                              fit: BoxFit.contain,
+                            )
+                          : const Center(
+                              child: CartoonEmblemBadge(
+                                kind: CartoonEmblemKind.trophyCup,
+                                size: 30,
+                              ),
+                            ),
+                    ),
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'JOUER SUR SEED #${_engine.seed} (OBJECTIF ${_engine.currentSeedHighScore} PTS)',
-                    style: const TextStyle(
-                      color: Color(0xFF0E1E16),
-                      fontSize: 11.0,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.4,
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        const Text(
+                          'VIVIENNE JUMP — SALON DES SCORES & SEEDS',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFD700),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: const Color(0xFF2B1105),
+                              width: 1.6,
+                            ),
+                          ),
+                          child: Text(
+                            'SEED #${_engine.seed} • RECORD : ${_engine.currentSeedHighScore} PTS (${_engine.bestAltitudeForSeed(_engine.seed)} M)',
+                            style: const TextStyle(
+                              color: Color(0xFF2B1105),
+                              fontSize: 9.2,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 10),
-            // Seed Leaderboard Table ("TABLEAU DES SCORES PAR SEED") immediately visible at top
+
+            // 2. HUGE 3D Cartoon Green/Gold "JOUER SUR SEED #..." Button
+            Juicy3DGameButton(
+              key: const Key('start_run_from_menu_button'),
+              minHeight: 56.0,
+              haptic: GameHapticKind.heavy,
+              backgroundColor: const Color(0xFF76FF03),
+              lipColor: const Color(0xFF33691E),
+              borderColor: const Color(0xFF2B1105),
+              borderWidth: 3.0,
+              borderRadius: 24.0,
+              lipDepth: 6.5,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              onTap: () => _engine.startRunFromMenu(targetSeed: _engine.seed),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const CartoonEmblemBadge(
+                    kind: CartoonEmblemKind.playTriangle,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'JOUER SUR SEED #${_engine.seed} (OBJECTIF ${_engine.currentSeedHighScore} PTS)',
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFF2B1105),
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // 3. Big Cartoon Quick-Access Sub-Menu Buttons (Angry Birds / Candy Crush style)
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Juicy3DGameButton(
+                    minHeight: 46,
+                    backgroundColor: const Color(0xFFFFD700),
+                    lipColor: const Color(0xFFBF6000),
+                    borderColor: const Color(0xFF2B1105),
+                    borderRadius: 18,
+                    lipDepth: 4.5,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 6,
+                    ),
+                    onTap: () => _selectTab(VivienneNavTab.editionsAndBiomes),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        CartoonEmblemBadge(
+                          kind: CartoonEmblemKind.crownEdition,
+                          size: 16,
+                        ),
+                        SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            'ÉDITIONS',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Color(0xFF2B1105),
+                              fontSize: 9.0,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Juicy3DGameButton(
+                    minHeight: 46,
+                    backgroundColor: const Color(0xFFFF80AB),
+                    lipColor: const Color(0xFFC2185B),
+                    borderColor: const Color(0xFF2B1105),
+                    borderRadius: 18,
+                    lipDepth: 4.5,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 6,
+                    ),
+                    onTap: () => _selectTab(VivienneNavTab.blossomHerbarium),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        CartoonEmblemBadge(
+                          kind: CartoonEmblemKind.blossomStar,
+                          size: 16,
+                        ),
+                        SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            'PLATEFORMES',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Color(0xFF2B1105),
+                              fontSize: 9.0,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Juicy3DGameButton(
+                    minHeight: 46,
+                    backgroundColor: const Color(0xFF29B6F6),
+                    lipColor: const Color(0xFF0277BD),
+                    borderColor: const Color(0xFF2B1105),
+                    borderRadius: 18,
+                    lipDepth: 4.5,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 6,
+                    ),
+                    onTap: () => _selectTab(VivienneNavTab.blenderAtelier),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        CartoonEmblemBadge(
+                          kind: CartoonEmblemKind.cube3DStudio,
+                          size: 16,
+                        ),
+                        SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            'STUDIO 3D',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9.0,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+
+            // 4. Candy Crush / Angry Birds Level-Style Seed Leaderboard Table
             _buildSeedLeaderboardSection(contextPrefix: 'menu'),
             const SizedBox(height: 10),
-            // Curated & Custom Seed Selector Card
+
+            // 5. Cartoon Curated & Custom Seed Selector Card
             _buildSeedPickerAndCustomInputCard(),
-            const SizedBox(height: 10),
-            // Compact 5-Platform Visual Reference in Menu
-            _buildFivePlatformsQuickGuide(),
           ],
         ),
       ),
@@ -1271,9 +1656,12 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xFF162D21),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x66FFD700)),
+        color: const Color(0xFFFFE0B2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: const Color(0xFF2B1105),
+          width: 2.5,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1281,10 +1669,10 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
           const Text(
             'CHOISIR OU SAISIR UN SEED DÉTERMINISTE',
             style: TextStyle(
-              color: Color(0xFFFFE082),
+              color: Color(0xFF2B1105),
               fontSize: 10.5,
               fontWeight: FontWeight.w900,
-              letterSpacing: 0.4,
+              letterSpacing: 0.3,
             ),
           ),
           const SizedBox(height: 6),
@@ -1293,25 +1681,43 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
             runSpacing: 6,
             children: <Widget>[
               for (final int s in VivienneJumpEngine.curatedSeeds)
-                ChoiceChip(
-                  label: Text(
-                    'Seed #$s (${_engine.bestScoreForSeed(s)} pts)',
-                    style: TextStyle(
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w800,
-                      color: _engine.seed == s
-                          ? const Color(0xFF0E1E16)
-                          : Colors.white,
-                    ),
-                  ),
-                  selected: _engine.seed == s,
-                  selectedColor: const Color(0xFFFFD700),
-                  backgroundColor: const Color(0xFF0E1E16),
-                  onSelected: (_) {
+                GestureDetector(
+                  onTap: () {
                     triggerGameHaptic(GameHapticKind.selection);
                     _customSeedController.text = s.toString();
                     _engine.replaySeed(s);
                   },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _engine.seed == s
+                          ? const Color(0xFFFFD700)
+                          : const Color(0xFFFFF8E7),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: const Color(0xFF2B1105),
+                        width: 2.0,
+                      ),
+                      boxShadow: const <BoxShadow>[
+                        BoxShadow(
+                          color: Color(0xFF4A1800),
+                          blurRadius: 0,
+                          offset: Offset(0, 2.5),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      'Seed #$s (${_engine.bestScoreForSeed(s)} pts)',
+                      style: const TextStyle(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF2B1105),
+                      ),
+                    ),
+                  ),
                 ),
             ],
           ),
@@ -1320,32 +1726,42 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
             children: <Widget>[
               Expanded(
                 child: SizedBox(
-                  height: 40,
+                  height: 42,
                   child: TextField(
                     key: const Key('custom_seed_input'),
                     controller: _customSeedController,
                     keyboardType: TextInputType.number,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFF2B1105),
                       fontSize: 11.5,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w900,
                     ),
                     decoration: InputDecoration(
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 10,
-                        vertical: 9,
+                        vertical: 10,
                       ),
                       hintText: 'Numéro de Seed (ex: 777)',
                       hintStyle: const TextStyle(
-                        color: Colors.white38,
+                        color: Color(0x882B1105),
                         fontSize: 10.5,
                       ),
                       filled: true,
-                      fillColor: const Color(0xFF0B1811),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(color: Colors.white24),
+                      fillColor: Colors.white,
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF2B1105),
+                          width: 2.2,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFFF4081),
+                          width: 2.6,
+                        ),
                       ),
                     ),
                   ),
@@ -1354,13 +1770,13 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
               const SizedBox(width: 8),
               Juicy3DGameButton(
                 key: const Key('apply_custom_seed_button'),
-                minWidth: 110,
-                minHeight: 40,
-                lipDepth: 3.5,
-                borderRadius: 12,
-                backgroundColor: const Color(0xFFE3A17B),
-                lipColor: const Color(0xFF8B1E24),
-                borderColor: const Color(0xFFFFE082),
+                minWidth: 112,
+                minHeight: 42,
+                lipDepth: 4.5,
+                borderRadius: 16,
+                backgroundColor: const Color(0xFFFF4081),
+                lipColor: const Color(0xFF880E4F),
+                borderColor: const Color(0xFF2B1105),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
                   vertical: 6,
@@ -1369,7 +1785,7 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                 child: const Text(
                   'LANCER SEED',
                   style: TextStyle(
-                    color: Color(0xFF1A0D0A),
+                    color: Colors.white,
                     fontSize: 9.5,
                     fontWeight: FontWeight.w900,
                   ),
@@ -1382,43 +1798,51 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
     );
   }
 
-  /// Shared Leaderboard Widget displayed in both the Store Main Menu AND the Game Over screen.
-  /// Displays rank (#1, #2, #3...), score, altitude, seed number, seed highscore, and a direct
-  /// 3D tactile "REJOUER CE SEED" button for every entry.
+  /// Shared Cartoon Leaderboard Widget displayed in both the Main Menu AND the Game Over screen.
+  /// Styled like a Candy Crush / Angry Birds level-ranking board with cartoon medals (#1, #2, #3),
+  /// star ratings, seed tags, and 3D tactile "REJOUER CE SEED" buttons.
   Widget _buildSeedLeaderboardSection({required String contextPrefix}) {
     final List<SeedScoreEntry> entries = _engine.bestEntriesBySeed;
 
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xFF13271D),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0x88FFD700)),
+        color: const Color(0xFFE1F5FE),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: const Color(0xFF2B1105),
+          width: 2.6,
+        ),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(
+            color: Color(0xFF0277BD),
+            blurRadius: 0,
+            offset: Offset(0, 4.0),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           const Row(
             children: <Widget>[
-              Icon(Icons.leaderboard, color: Color(0xFFFFD700), size: 15),
+              CartoonEmblemBadge(
+                kind: CartoonEmblemKind.trophyCup,
+                size: 20,
+              ),
               SizedBox(width: 6),
               Expanded(
                 child: Text(
                   'TABLEAU DES SCORES PAR SEED (HIGHSCORES)',
                   style: TextStyle(
-                    color: Color(0xFFFFD700),
+                    color: Color(0xFF2B1105),
                     fontSize: 11.0,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: 0.4,
+                    letterSpacing: 0.3,
                   ),
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 3),
-          const Text(
-            'Chaque Seed génère exactement le même parcours. Appuyez sur « REJOUER CE SEED » pour battre son Highscore !',
-            style: TextStyle(color: Colors.white70, fontSize: 9.2),
           ),
           const SizedBox(height: 8),
           for (int i = 0; i < entries.length; i++)
@@ -1438,50 +1862,62 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
     required String contextPrefix,
   }) {
     final bool isCurrentSeed = entry.seed == _engine.seed;
-    final Color rankColor = switch (rank) {
+    final Color medalColor = switch (rank) {
       1 => const Color(0xFFFFD700),
       2 => const Color(0xFFE0E0E0),
-      3 => const Color(0xFFCD7F32),
-      _ => const Color(0xFF80D8FF),
+      3 => const Color(0xFFFFB74D),
+      _ => const Color(0xFF29B6F6),
     };
     final int seedBest = _engine.bestScoreForSeed(entry.seed);
+    final int stars = entry.score >= 4200
+        ? 3
+        : entry.score >= 3200
+        ? 2
+        : 1;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 6),
+      margin: const EdgeInsets.only(bottom: 7),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
       decoration: BoxDecoration(
         color: isCurrentSeed
-            ? const Color(0xFF1D3A2B)
-            : const Color(0xFF0D1B14),
-        borderRadius: BorderRadius.circular(11),
+            ? const Color(0xFFFFF59D)
+            : const Color(0xFFFFF8E7),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isCurrentSeed ? const Color(0xFFFFD700) : Colors.white24,
-          width: isCurrentSeed ? 1.4 : 0.9,
+          color: const Color(0xFF2B1105),
+          width: isCurrentSeed ? 2.6 : 2.0,
         ),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(
+            color: Color(0x332B1105),
+            blurRadius: 0,
+            offset: Offset(0, 2.5),
+          ),
+        ],
       ),
       child: Row(
         children: <Widget>[
-          // Rank Badge (#1, #2, #3...)
+          // Cartoon Medal Badge (#1, #2, #3...)
           Container(
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: rankColor.withValues(alpha: 0.20),
+              color: medalColor,
               shape: BoxShape.circle,
-              border: Border.all(color: rankColor, width: 1.3),
+              border: Border.all(color: const Color(0xFF2B1105), width: 2.0),
             ),
             alignment: Alignment.center,
             child: Text(
               '#$rank',
-              style: TextStyle(
-                color: rankColor,
-                fontSize: 10.0,
+              style: const TextStyle(
+                color: Color(0xFF2B1105),
+                fontSize: 9.8,
                 fontWeight: FontWeight.w900,
               ),
             ),
           ),
-          const SizedBox(width: 8),
-          // Score, Altitude, Seed & Player Tag
+          const SizedBox(width: 6),
+          // Score, Stars, Altitude & Seed Tag
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1491,33 +1927,33 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 5,
-                        vertical: 1,
+                        vertical: 1.5,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0x33FFD700),
-                        borderRadius: BorderRadius.circular(5),
+                        color: const Color(0xFF29B6F6),
+                        borderRadius: BorderRadius.circular(8),
                         border: Border.all(
-                          color: const Color(0xAAFFD700),
-                          width: 0.8,
+                          color: const Color(0xFF2B1105),
+                          width: 1.4,
                         ),
                       ),
                       child: Text(
                         'SEED #${entry.seed}',
                         style: const TextStyle(
-                          color: Color(0xFFFFE082),
-                          fontSize: 8.5,
+                          color: Colors.white,
+                          fontSize: 8.2,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    Flexible(
+                    const SizedBox(width: 5),
+                    Expanded(
                       child: Text(
                         '${entry.score} pts • ${entry.altitudeMeters} m',
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10.5,
+                          color: Color(0xFF2B1105),
+                          fontSize: 10.0,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
@@ -1525,48 +1961,59 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                   ],
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  'Highscore Seed: $seedBest pts • ${entry.playerTag}',
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: entry.isPlayerRun
-                        ? const Color(0xFF80D8FF)
-                        : Colors.white70,
-                    fontSize: 8.8,
-                    fontWeight: FontWeight.w600,
-                  ),
+                Row(
+                  children: <Widget>[
+                    for (int s = 0; s < 3; s++)
+                      Icon(
+                        Icons.star_rounded,
+                        size: 11,
+                        color: s < stars
+                            ? const Color(0xFFFFAB00)
+                            : const Color(0x332B1105),
+                      ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        'Record: $seedBest pts • ${entry.playerTag}',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Color(0xFF5D4037),
+                          fontSize: 8.5,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
           const SizedBox(width: 6),
-          // Direct 3D Action Button: "REJOUER CE SEED"
+          // Direct 3D Cartoon Action Button: "REJOUER CE SEED"
           Juicy3DGameButton(
             key: Key('${contextPrefix}_replay_seed_${entry.seed}'),
-            minWidth: 96,
+            minWidth: 90,
             minHeight: 36,
-            lipDepth: 3.0,
-            borderRadius: 10,
+            lipDepth: 3.5,
+            borderRadius: 14,
             haptic: GameHapticKind.medium,
             backgroundColor: isCurrentSeed
-                ? const Color(0xFFFFD700)
-                : const Color(0xFF234432),
+                ? const Color(0xFF76FF03)
+                : const Color(0xFFFFD700),
             lipColor: isCurrentSeed
-                ? const Color(0xFF9E6B14)
-                : const Color(0xFF0E1E16),
-            borderColor: const Color(0xFFFFD700),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                ? const Color(0xFF33691E)
+                : const Color(0xFFBF6000),
+            borderColor: const Color(0xFF2B1105),
+            padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
             onTap: () {
               _customSeedController.text = entry.seed.toString();
               _engine.replaySeed(entry.seed);
             },
-            child: Text(
+            child: const Text(
               'REJOUER CE SEED',
               style: TextStyle(
-                color: isCurrentSeed
-                    ? const Color(0xFF0E1E16)
-                    : const Color(0xFFFFD700),
-                fontSize: 8.2,
+                color: Color(0xFF2B1105),
+                fontSize: 8.0,
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -1576,209 +2023,180 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
     );
   }
 
-  Widget _buildFivePlatformsQuickGuide() {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: const Color(0xFF13271D),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white24),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          const Text(
-            'LES 5 TYPES DE PLATEFORMES & EFFETS DE SAUT',
-            style: TextStyle(
-              color: Color(0xFFFFD700),
-              fontSize: 10.5,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.4,
-            ),
-          ),
-          const SizedBox(height: 6),
-          for (final LvPlatformType p in LvPlatformType.values)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 5),
-              child: Row(
+  Widget _buildEditionsAndBiomesPanel() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: CartoonBouncyModal(
+        backgroundColor: const Color(0xFFFFF8E7),
+        borderColor: const Color(0xFF2B1105),
+        lipColor: const Color(0xFF4A1800),
+        borderRadius: 28,
+        lipDepth: 6.5,
+        child: ListView(
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFD700),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFF2B1105), width: 2.5),
+              ),
+              child: const Row(
                 children: <Widget>[
-                  Container(
-                    width: 78,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5,
-                      vertical: 2.5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: p.accentColor.withValues(alpha: 0.18),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: p.accentColor, width: 1.0),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      p.badgeText,
-                      style: TextStyle(
-                        color: p.accentColor,
-                        fontSize: 8.0,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
+                  CartoonEmblemBadge(
+                    kind: CartoonEmblemKind.crownEdition,
+                    size: 24,
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      '${p.title} — ${p.shortEffectLabel}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 9.0,
-                        fontWeight: FontWeight.w600,
+                      'MAISON LOUIS VUITTON — 4 ÉDITIONS VIVIENNE',
+                      style: TextStyle(
+                        color: Color(0xFF2B1105),
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.4,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEditionsAndBiomesPanel() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xEE0E1E16),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white24),
-      ),
-      child: ListView(
-        children: <Widget>[
-          const Text(
-            'MAISON LOUIS VUITTON — 4 ÉDITIONS VIVIENNE',
-            style: TextStyle(
-              color: Color(0xFFFFD700),
-              fontSize: 13.5,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.6,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Parcours déterministe par Seed (max 3 plateformes à portée de saut) et paysages naturels en parallaxe.',
-            style: TextStyle(color: Colors.white70, fontSize: 11.0),
-          ),
-          const SizedBox(height: 10),
-          // Deterministic Seed Selector Bar
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFF162C21),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0x55FFD700)),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'SEED DU PARCOURS DÉTERMINISTE : #${_engine.seed} (HIGHSCORE : ${_engine.currentSeedHighScore} PTS)',
-                  style: const TextStyle(
-                    color: Color(0xFFFFE082),
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w800,
+            const SizedBox(height: 10),
+            // Deterministic Seed Selector Bar
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFE0B2),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFF2B1105), width: 2.2),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'SEED DU PARCOURS DÉTERMINISTE : #${_engine.seed} (HIGHSCORE : ${_engine.currentSeedHighScore} PTS)',
+                    style: const TextStyle(
+                      color: Color(0xFF2B1105),
+                      fontSize: 10.0,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: <Widget>[
-                    for (final int s in VivienneJumpEngine.curatedSeeds)
-                      ChoiceChip(
-                        label: Text(
-                          'Seed #$s (${_engine.bestScoreForSeed(s)} pts)',
-                          style: TextStyle(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w800,
-                            color: _engine.seed == s
-                                ? const Color(0xFF0E1E16)
-                                : Colors.white,
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: <Widget>[
+                      for (final int s in VivienneJumpEngine.curatedSeeds)
+                        GestureDetector(
+                          onTap: () {
+                            triggerGameHaptic(GameHapticKind.selection);
+                            _customSeedController.text = s.toString();
+                            _engine.setSeed(s);
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 9,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: _engine.seed == s
+                                  ? const Color(0xFF76FF03)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFF2B1105),
+                                width: 1.8,
+                              ),
+                            ),
+                            child: Text(
+                              'Seed #$s (${_engine.bestScoreForSeed(s)} pts)',
+                              style: const TextStyle(
+                                fontSize: 9.2,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF2B1105),
+                              ),
+                            ),
                           ),
                         ),
-                        selected: _engine.seed == s,
-                        selectedColor: const Color(0xFFFFD700),
-                        backgroundColor: const Color(0xFF0E1E16),
-                        onSelected: (_) {
-                          triggerGameHaptic(GameHapticKind.selection);
-                          _customSeedController.text = s.toString();
-                          _engine.setSeed(s);
-                        },
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            for (final VivienneEdition ed in VivienneEdition.values)
+              _buildEditionCard(ed),
+            const SizedBox(height: 10),
+            const Text(
+              'ACCÈS DIRECT AUX 4 PAYSAGES NATURELS EN PARALLAXE',
+              style: TextStyle(
+                color: Color(0xFF2B1105),
+                fontSize: 11.5,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.4,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: <Widget>[
+                for (final LvBiome b in LvBiome.values)
+                  GestureDetector(
+                    onTap: () {
+                      triggerGameHaptic(GameHapticKind.medium);
+                      _engine.warpToAltitude(
+                        b.minAltitudeMeters.toDouble() + 120.0,
+                      );
+                      _selectTab(VivienneNavTab.ascension);
+                    },
+                    child: Container(
+                      width: 152,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: b.topColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: const Color(0xFF2B1105),
+                          width: 2.2,
+                        ),
+                        boxShadow: const <BoxShadow>[
+                          BoxShadow(
+                            color: Color(0xFF4A1800),
+                            blurRadius: 0,
+                            offset: Offset(0, 3.0),
+                          ),
+                        ],
                       ),
-                  ],
-                ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            b.name,
+                            style: TextStyle(
+                              color: b.horizonGlowColor,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Dès ${b.minAltitudeMeters} m',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9.2,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
-          ),
-          const SizedBox(height: 12),
-          for (final VivienneEdition ed in VivienneEdition.values)
-            _buildEditionCard(ed),
-          const SizedBox(height: 12),
-          const Text(
-            'ACCÈS DIRECT AUX 4 PAYSAGES NATURELS EN PARALLAXE',
-            style: TextStyle(
-              color: Color(0xFFFFD700),
-              fontSize: 12.5,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.6,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: <Widget>[
-              for (final LvBiome b in LvBiome.values)
-                GestureDetector(
-                  onTap: () {
-                    triggerGameHaptic(GameHapticKind.medium);
-                    _engine.warpToAltitude(
-                      b.minAltitudeMeters.toDouble() + 120.0,
-                    );
-                    _selectTab(VivienneNavTab.ascension);
-                  },
-                  child: Container(
-                    width: 155,
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: b.topColor,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: b.horizonGlowColor),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          b.name,
-                          style: TextStyle(
-                            color: b.horizonGlowColor,
-                            fontSize: 11.0,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Dès ${b.minAltitudeMeters} m',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 9.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1789,12 +2207,19 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFF1C3528) : const Color(0xFF14271D),
-        borderRadius: BorderRadius.circular(12),
+        color: isSelected ? const Color(0xFFFFF59D) : Colors.white,
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isSelected ? const Color(0xFFFFD700) : Colors.white24,
-          width: isSelected ? 1.6 : 1.0,
+          color: const Color(0xFF2B1105),
+          width: isSelected ? 2.8 : 2.0,
         ),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(
+            color: Color(0x332B1105),
+            blurRadius: 0,
+            offset: Offset(0, 3.0),
+          ),
+        ],
       ),
       child: Row(
         children: <Widget>[
@@ -1802,9 +2227,9 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
             width: 46,
             height: 46,
             decoration: BoxDecoration(
-              color: const Color(0xFF0D1A13),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: ed.accentColor),
+              color: const Color(0xFFFFE0B2),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFF2B1105), width: 2.0),
             ),
             child: _blenderSprites[VivienneBlenderPose.pose5GrandApex] != null
                 ? RawImage(
@@ -1823,26 +2248,27 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
               children: <Widget>[
                 Text(
                   ed.name,
-                  style: TextStyle(
-                    color: ed.accentColor,
-                    fontSize: 12.0,
+                  style: const TextStyle(
+                    color: Color(0xFF2B1105),
+                    fontSize: 11.5,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
                 Text(
                   ed.subtitle,
                   style: const TextStyle(
-                    color: Color(0xFFE3A17B),
-                    fontSize: 10.0,
-                    fontWeight: FontWeight.w700,
+                    color: Color(0xFFD81B60),
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   ed.perkLabel,
                   style: const TextStyle(
-                    color: Colors.white70,
-                    fontSize: 9.5,
+                    color: Color(0xFF5D4037),
+                    fontSize: 9.0,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -1850,17 +2276,17 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
           ),
           const SizedBox(width: 8),
           Juicy3DGameButton(
-            minWidth: 72,
+            minWidth: 74,
             minHeight: 38,
-            lipDepth: 3.0,
-            borderRadius: 12,
+            lipDepth: 4.0,
+            borderRadius: 14,
             backgroundColor: isSelected
-                ? const Color(0xFFFFD700)
-                : const Color(0xFF244232),
+                ? const Color(0xFF76FF03)
+                : const Color(0xFFFFD700),
             lipColor: isSelected
-                ? const Color(0xFF9E6B14)
-                : const Color(0xFF0D1A13),
-            borderColor: const Color(0xFFFFD700),
+                ? const Color(0xFF33691E)
+                : const Color(0xFFBF6000),
+            borderColor: const Color(0xFF2B1105),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             onTap: () {
               _engine.selectEdition(ed);
@@ -1868,10 +2294,8 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
             },
             child: Text(
               isSelected ? 'ACTIF' : 'CHOISIR',
-              style: TextStyle(
-                color: isSelected
-                    ? const Color(0xFF0E1E16)
-                    : const Color(0xFFFFD700),
+              style: const TextStyle(
+                color: Color(0xFF2B1105),
                 fontSize: 9.5,
                 fontWeight: FontWeight.w900,
               ),
@@ -1882,193 +2306,223 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
     );
   }
 
+  /// Cartoon Herbarium Panel:
+  /// - Platform descriptions (`p.description` and `p.shortEffectLabel`) are STRICTLY HIDDEN!
+  /// - Displays ONLY `p.title`, the Cartoon multiplier badge (`×1.00`, `×1.45`, `×0.85`, `1×`, `×1.14`),
+  ///   and the visual particle effect pill (`CartoonParticleEffectVisualPill`).
   Widget _buildBlossomHerbariumPanel() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xEE0E1E16),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white24),
-      ),
-      child: ListView(
-        children: <Widget>[
-          const Text(
-            'HERBIER BLOSSOM & 5 ARCHITECTURES DE PLATEFORMES',
-            style: TextStyle(
-              color: Color(0xFFFFD700),
-              fontSize: 13.0,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text(
-            'Chaque plateforme possède un multiplicateur d\'impulsion et un comportement physique distinct.',
-            style: TextStyle(color: Colors.white70, fontSize: 10.5),
-          ),
-          const SizedBox(height: 8),
-          for (final LvPlatformType p in LvPlatformType.values)
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: CartoonBouncyModal(
+        backgroundColor: const Color(0xFFFFF8E7),
+        borderColor: const Color(0xFF2B1105),
+        lipColor: const Color(0xFF4A1800),
+        borderRadius: 28,
+        lipDepth: 6.5,
+        child: ListView(
+          children: <Widget>[
             Container(
-              margin: const EdgeInsets.only(bottom: 7),
-              padding: const EdgeInsets.all(9),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFF14271D),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: p.accentColor.withValues(alpha: 0.65),
-                  width: 1.2,
-                ),
+                color: const Color(0xFFFF80AB),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFF2B1105), width: 2.5),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: const Row(
                 children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: p.accentColor.withValues(alpha: 0.22),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: p.accentColor),
-                        ),
-                        child: Text(
-                          p.badgeText,
-                          style: TextStyle(
-                            color: p.accentColor,
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '${p.title} (×${p.impulseMultiplier.toStringAsFixed(2)})',
-                          style: const TextStyle(
-                            color: Color(0xFFFFE082),
-                            fontSize: 11.0,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                    ],
+                  CartoonEmblemBadge(
+                    kind: CartoonEmblemKind.blossomStar,
+                    size: 24,
                   ),
-                  const SizedBox(height: 3),
-                  Text(
-                    p.shortEffectLabel,
-                    style: TextStyle(
-                      color: p.accentColor,
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    p.description,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 9.2,
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'HERBIER BLOSSOM & 5 ARCHITECTURES DE PLATEFORMES',
+                      style: TextStyle(
+                        color: Color(0xFF2B1105),
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.3,
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          const SizedBox(height: 8),
-          const Text(
-            'TRÉSORS & FLEURS BLOSSOM LOUIS VUITTON',
-            style: TextStyle(
-              color: Color(0xFFFFD700),
-              fontSize: 12.0,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 6),
-          for (final BlossomItemType item in BlossomItemType.values)
-            Container(
-              margin: const EdgeInsets.only(bottom: 7),
-              padding: const EdgeInsets.all(9),
-              decoration: BoxDecoration(
-                color: const Color(0xFF14271D),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: item.primaryColor.withValues(alpha: 0.55),
+            const SizedBox(height: 10),
+            for (final LvPlatformType p in LvPlatformType.values)
+              Container(
+                margin: const EdgeInsets.only(bottom: 7),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: const Color(0xFF2B1105),
+                    width: 2.3,
+                  ),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(
+                      color: Color(0x332B1105),
+                      blurRadius: 0,
+                      offset: Offset(0, 3.0),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: <Widget>[
+                    // Cartoon Multiplier Badge (`×1.00`, `×1.45`, `×0.85`, `1×`, `×1.14`)
+                    Container(
+                      width: 56,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: p.accentColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFF2B1105),
+                          width: 2.0,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        p.singleUse
+                            ? '1×'
+                            : '×${p.impulseMultiplier.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          color: Color(0xFF2B1105),
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    // Short platform title ONLY (no description, no shortEffectLabel)
+                    Expanded(
+                      child: Text(
+                        p.title,
+                        style: const TextStyle(
+                          color: Color(0xFF2B1105),
+                          fontSize: 11.0,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    // Visual particle effect pill
+                    CartoonParticleEffectVisualPill(platformType: p),
+                  ],
                 ),
               ),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    width: 34,
-                    height: 34,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: const Color(0xFF0D1A13),
-                      border: Border.all(color: item.primaryColor, width: 1.4),
-                    ),
-                    alignment: Alignment.center,
-                    child: Icon(
-                      item == BlossomItemType.speedyBagBoost
-                          ? Icons.shopping_bag
-                          : item == BlossomItemType.goldenPadlockShield
-                          ? Icons.lock
-                          : Icons.local_florist,
-                      color: item.primaryColor,
-                      size: 17,
-                    ),
+            const SizedBox(height: 10),
+            const Text(
+              'TRÉSORS & FLEURS BLOSSOM LOUIS VUITTON',
+              style: TextStyle(
+                color: Color(0xFF2B1105),
+                fontSize: 11.5,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 6),
+            for (final BlossomItemType item in BlossomItemType.values)
+              Container(
+                margin: const EdgeInsets.only(bottom: 7),
+                padding: const EdgeInsets.all(9),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFF2B1105),
+                    width: 2.0,
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Text(
-                                item.title,
-                                style: TextStyle(
-                                  color: item.primaryColor,
-                                  fontSize: 11.0,
-                                  fontWeight: FontWeight.w900,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: item.primaryColor,
+                        border: Border.all(
+                          color: const Color(0xFF2B1105),
+                          width: 2.0,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Icon(
+                        item == BlossomItemType.speedyBagBoost
+                            ? Icons.shopping_bag
+                            : item == BlossomItemType.goldenPadlockShield
+                            ? Icons.lock
+                            : Icons.local_florist,
+                        color: const Color(0xFF2B1105),
+                        size: 18,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                  item.title,
+                                  style: const TextStyle(
+                                    color: Color(0xFF2B1105),
+                                    fontSize: 10.8,
+                                    fontWeight: FontWeight.w900,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Text(
-                              '+${item.points} pts',
-                              style: const TextStyle(
-                                color: Color(0xFFFFD700),
-                                fontSize: 10.0,
-                                fontWeight: FontWeight.w800,
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFD700),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: const Color(0xFF2B1105),
+                                    width: 1.4,
+                                  ),
+                                ),
+                                child: Text(
+                                  '+${item.points} pts',
+                                  style: const TextStyle(
+                                    color: Color(0xFF2B1105),
+                                    fontSize: 9.0,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
                               ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            item.subtitle,
+                            style: const TextStyle(
+                              color: Color(0xFFD81B60),
+                              fontSize: 9.2,
+                              fontWeight: FontWeight.w800,
                             ),
-                          ],
-                        ),
-                        Text(
-                          item.subtitle,
-                          style: const TextStyle(
-                            color: Color(0xFFE3A17B),
-                            fontSize: 9.2,
-                            fontWeight: FontWeight.w700,
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          item.description,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 9.0,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -2077,243 +2531,130 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
     final VivienneBlenderKinematics kin =
         VivienneBlenderKinematics.evaluateAtFrame(_atelierFrameScrubber);
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xEE0E1E16),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white24),
-      ),
-      child: ListView(
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      'ATELIER BLENDER 3D — vivienne_speedy_v03.blend',
-                      style: TextStyle(
-                        color: Color(0xFFFFD700),
-                        fontSize: 13.0,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    Text(
-                      'Source : orbitalstorm/BLENDER_LAB/models/vivienne_speedy_v03.blend (Rig 22 Os • 72 Frames @ 24 FPS)',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 9.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Switch(
-                value: _engine.showBlenderRigOverlay,
-                activeThumbColor: const Color(0xFFFFD700),
-                onChanged: (_) => _engine.toggleBlenderRigOverlay(),
-              ),
-              const Text(
-                'Rig 22 Os',
-                style: TextStyle(
-                  color: Color(0xFFFFD700),
-                  fontSize: 10.0,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Container(
-            height: 195,
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: const Color(0xFF09140E),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFFFFD700), width: 1.2),
-            ),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  flex: 5,
-                  child: Center(
-                    child: Transform.scale(
-                      scaleX: kin.sxBody,
-                      scaleY: kin.szBody,
-                      child: _blenderSprites[_selectedAtelierPose] != null
-                          ? RawImage(
-                              image: _blenderSprites[_selectedAtelierPose],
-                              fit: BoxFit.contain,
-                            )
-                          : Image.asset(
-                              _selectedAtelierPose.assetPath,
-                              fit: BoxFit.contain,
-                            ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 6,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        _selectedAtelierPose.label,
-                        style: const TextStyle(
-                          color: Color(0xFFFFD700),
-                          fontSize: 11.0,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      _buildKinematicMetric(
-                        'Frame Hermite (1..72)',
-                        'F${_atelierFrameScrubber.round()} (Saut ${kin.jumpIndex + 1}/3)',
-                      ),
-                      _buildKinematicMetric(
-                        'Squash/Stretch Corps',
-                        'sz=${kin.szBody.toStringAsFixed(3)} • sx=${kin.sxBody.toStringAsFixed(3)}',
-                      ),
-                      _buildKinematicMetric(
-                        'Volume (sx·sy·sz)',
-                        (kin.sxBody * kin.sxBody * kin.szBody).toStringAsFixed(
-                          4,
-                        ),
-                      ),
-                      _buildKinematicMetric(
-                        'Élévation Bras en V',
-                        '${(kin.armRaise * 100).round()} %',
-                      ),
-                      _buildKinematicMetric(
-                        'Onde Pétales Vachetta',
-                        kin.petalBloomWave.toStringAsFixed(2),
-                      ),
-                      _buildKinematicMetric(
-                        'Oscillation Sac Speedy',
-                        '${kin.speedyBagSwingDeg.toStringAsFixed(1)}°',
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: <Widget>[
-              const Text(
-                'Timeline 72f :',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 10.0,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Slider(
-                    value: _atelierFrameScrubber,
-                    min: 1.0,
-                    max: 72.0,
-                    activeColor: const Color(0xFFFFD700),
-                    onChanged: (double v) {
-                      setState(() {
-                        _atelierFrameScrubber = v;
-                        _selectedAtelierPose =
-                            VivienneBlenderKinematics.evaluateAtFrame(
-                              v,
-                            ).recommendedPose;
-                      });
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: <Widget>[
-              for (final VivienneBlenderPose p in VivienneBlenderPose.values)
-                ChoiceChip(
-                  label: Text(
-                    'Pose ${p.index + 1} (F${p.frameNumber})',
-                    style: TextStyle(
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w800,
-                      color: _selectedAtelierPose == p
-                          ? const Color(0xFF0E1E16)
-                          : const Color(0xFFFFD700),
-                    ),
-                  ),
-                  selected: _selectedAtelierPose == p,
-                  selectedColor: const Color(0xFFFFD700),
-                  backgroundColor: const Color(0xFF14271D),
-                  onSelected: (_) {
-                    setState(() {
-                      _selectedAtelierPose = p;
-                      _atelierFrameScrubber = p.frameNumber.toDouble();
-                    });
-                  },
-                ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            '5 MATÉRIAUX PBR OFFICIELS (Principled BSDF • Cycles AgX)',
-            style: TextStyle(
-              color: Color(0xFFFFD700),
-              fontSize: 11.5,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 6),
-          for (final BlenderPbrMaterialSpec m
-              in BlenderPbrMaterialSpec.officialMaterials)
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: CartoonBouncyModal(
+        backgroundColor: const Color(0xFFFFF8E7),
+        borderColor: const Color(0xFF2B1105),
+        lipColor: const Color(0xFF4A1800),
+        borderRadius: 28,
+        lipDepth: 6.5,
+        child: ListView(
+          children: <Widget>[
             Container(
-              margin: const EdgeInsets.only(bottom: 6),
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFF14271D),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.white24),
+                color: const Color(0xFF29B6F6),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFF2B1105), width: 2.5),
               ),
               child: Row(
                 children: <Widget>[
-                  Container(
-                    width: 22,
-                    height: 22,
-                    decoration: BoxDecoration(
-                      color: m.color,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFFFFD700)),
-                    ),
+                  const CartoonEmblemBadge(
+                    kind: CartoonEmblemKind.cube3DStudio,
+                    size: 24,
                   ),
-                  const SizedBox(width: 9),
-                  Expanded(
+                  const SizedBox(width: 8),
+                  const Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          '${m.shaderName} (${m.hexColor}) — ${m.title}',
-                          style: const TextStyle(
-                            color: Color(0xFFFFE082),
-                            fontSize: 10.0,
-                            fontWeight: FontWeight.w800,
+                          'ATELIER BLENDER 3D — vivienne_speedy_v03.blend',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 0.3,
                           ),
                         ),
                         Text(
-                          'Roughness ${m.roughness} • Metallic ${m.metallic} • ${m.assignedParts}',
-                          style: const TextStyle(
-                            color: Colors.white70,
+                          'Rig 22 Os • 72 Frames @ 24 FPS • Hermite Volume Constant',
+                          style: TextStyle(
+                            color: Color(0xFFFFF8E7),
                             fontSize: 9.0,
+                            fontWeight: FontWeight.w700,
                           ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch(
+                    value: _engine.showBlenderRigOverlay,
+                    activeThumbColor: const Color(0xFFFFD700),
+                    onChanged: (_) => _engine.toggleBlenderRigOverlay(),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              height: 190,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A3B5C),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFF2B1105), width: 2.6),
+              ),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    flex: 5,
+                    child: Center(
+                      child: Transform.scale(
+                        scaleX: kin.sxBody,
+                        scaleY: kin.szBody,
+                        child: _blenderSprites[_selectedAtelierPose] != null
+                            ? RawImage(
+                                image: _blenderSprites[_selectedAtelierPose],
+                                fit: BoxFit.contain,
+                              )
+                            : Image.asset(
+                                _selectedAtelierPose.assetPath,
+                                fit: BoxFit.contain,
+                              ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 6,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          _selectedAtelierPose.label,
+                          style: const TextStyle(
+                            color: Color(0xFFFFD700),
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        _buildKinematicMetric(
+                          'Frame Hermite (1..72)',
+                          'F${_atelierFrameScrubber.round()} (Saut ${kin.jumpIndex + 1}/3)',
+                        ),
+                        _buildKinematicMetric(
+                          'Squash/Stretch Corps',
+                          'sz=${kin.szBody.toStringAsFixed(3)} • sx=${kin.sxBody.toStringAsFixed(3)}',
+                        ),
+                        _buildKinematicMetric(
+                          'Volume (sx·sy·sz)',
+                          (kin.sxBody * kin.sxBody * kin.szBody)
+                              .toStringAsFixed(4),
+                        ),
+                        _buildKinematicMetric(
+                          'Élévation Bras en V',
+                          '${(kin.armRaise * 100).round()} %',
+                        ),
+                        _buildKinematicMetric(
+                          'Onde Pétales Vachetta',
+                          kin.petalBloomWave.toStringAsFixed(2),
+                        ),
+                        _buildKinematicMetric(
+                          'Oscillation Sac Speedy',
+                          '${kin.speedyBagSwingDeg.toStringAsFixed(1)}°',
                         ),
                       ],
                     ),
@@ -2321,7 +2662,144 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                 ],
               ),
             ),
-        ],
+            const SizedBox(height: 8),
+            Row(
+              children: <Widget>[
+                const Text(
+                  'Timeline 72f :',
+                  style: TextStyle(
+                    color: Color(0xFF2B1105),
+                    fontSize: 10.0,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Slider(
+                      value: _atelierFrameScrubber,
+                      min: 1.0,
+                      max: 72.0,
+                      activeColor: const Color(0xFFFF4081),
+                      onChanged: (double v) {
+                        setState(() {
+                          _atelierFrameScrubber = v;
+                          _selectedAtelierPose =
+                              VivienneBlenderKinematics.evaluateAtFrame(
+                                v,
+                              ).recommendedPose;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: <Widget>[
+                for (final VivienneBlenderPose p in VivienneBlenderPose.values)
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedAtelierPose = p;
+                        _atelierFrameScrubber = p.frameNumber.toDouble();
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _selectedAtelierPose == p
+                            ? const Color(0xFFFFD700)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFF2B1105),
+                          width: 1.8,
+                        ),
+                      ),
+                      child: Text(
+                        'Pose ${p.index + 1} (F${p.frameNumber})',
+                        style: const TextStyle(
+                          fontSize: 9.2,
+                          fontWeight: FontWeight.w900,
+                          color: Color(0xFF2B1105),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              '5 MATÉRIAUX PBR OFFICIELS (vivienne_speedy_v03.blend)',
+              style: TextStyle(
+                color: Color(0xFF2B1105),
+                fontSize: 11.0,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 6),
+            for (final BlenderPbrMaterialSpec m
+                in BlenderPbrMaterialSpec.officialMaterials)
+              Container(
+                margin: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFF2B1105),
+                    width: 2.0,
+                  ),
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: m.color,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: const Color(0xFF2B1105),
+                          width: 1.8,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 9),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            '${m.shaderName} (${m.hexColor}) — ${m.title}',
+                            style: const TextStyle(
+                              color: Color(0xFF2B1105),
+                              fontSize: 9.8,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          Text(
+                            'Roughness ${m.roughness} • Metallic ${m.metallic} • ${m.assignedParts}',
+                            style: const TextStyle(
+                              color: Color(0xFF5D4037),
+                              fontSize: 8.8,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -2346,7 +2824,7 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
               style: const TextStyle(
                 color: Color(0xFFFFE082),
                 fontSize: 9.0,
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w900,
               ),
             ),
           ),
@@ -2355,54 +2833,91 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
     );
   }
 
-  /// Enriched Game Over Overlay (`engine.isGameOver`) featuring:
+  /// Cartoon Pop Game Over Overlay (`engine.isGameOver`) inspired by Angry Birds / Candy Crush:
+  /// - Bouncy Cartoon Ribbon Header (`FIN D'ASCENSION`) with Star Rating
   /// - Run Score, Altitude, Seed Record comparison & New Seed Record Banner
-  /// - Full Seed Leaderboard ("TABLEAU DES SCORES PAR SEED") with "REJOUER CE SEED"
-  /// - Primary 3D Tactile "REJOUER CE SEED" & "SALON DES SEEDS" buttons
+  /// - Full Seed Leaderboard (`TABLEAU DES SCORES PAR SEED`) with `REJOUER CE SEED`
+  /// - Primary 3D Tactile `REJOUER SEED` & `CHANGER SEED` buttons
   Widget _buildGameOverOverlay() {
     final int seedBest = _engine.bestScoreForSeed(_engine.seed);
     final int seedBestAlt = _engine.bestAltitudeForSeed(_engine.seed);
 
     return Container(
       key: const Key('game_over_overlay'),
-      color: const Color(0xCC07120D),
-      padding: const EdgeInsets.fromLTRB(12, 82, 12, 64),
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xF412261C),
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: const Color(0xFFFFD700), width: 1.8),
-        ),
+      color: const Color(0x88102A43),
+      padding: const EdgeInsets.fromLTRB(10, 76, 10, 66),
+      child: CartoonBouncyModal(
+        backgroundColor: const Color(0xFFFFF8E7),
+        borderColor: const Color(0xFF2B1105),
+        lipColor: const Color(0xFF4A1800),
+        borderRadius: 28,
+        lipDepth: 7.0,
+        padding: const EdgeInsets.all(12),
         child: ListView(
           children: <Widget>[
-            const Text(
-              'FIN D\'ASCENSION',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Color(0xFFFFD700),
-                fontSize: 17,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.8,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFF4081),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: const Color(0xFF2B1105),
+                  width: 2.8,
+                ),
+                boxShadow: const <BoxShadow>[
+                  BoxShadow(
+                    color: Color(0xFF880E4F),
+                    blurRadius: 0,
+                    offset: Offset(0, 4.0),
+                  ),
+                ],
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  CartoonEmblemBadge(
+                    kind: CartoonEmblemKind.trophyCup,
+                    size: 24,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'FIN D\'ASCENSION',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  CartoonEmblemBadge(
+                    kind: CartoonEmblemKind.blossomStar,
+                    size: 24,
+                  ),
+                ],
               ),
             ),
             if (_engine.lastRunBeatSeedRecord) ...<Widget>[
-              const SizedBox(height: 6),
+              const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 4,
+                  vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0x33FFD700),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFFFFD700)),
+                  color: const Color(0xFFFFD700),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFF2B1105),
+                    width: 2.2,
+                  ),
                 ),
                 child: Text(
                   'NOUVEAU RECORD SUR LE SEED #${_engine.seed} !',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    color: Color(0xFFFFF59D),
+                    color: Color(0xFF2B1105),
                     fontSize: 10.5,
                     fontWeight: FontWeight.w900,
                   ),
@@ -2413,18 +2928,36 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C1A13),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white24),
+                color: const Color(0xFFFFE0B2),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: const Color(0xFF2B1105),
+                  width: 2.4,
+                ),
               ),
               child: Column(
                 children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      for (int i = 0; i < 3; i++)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 2),
+                          child: Icon(
+                            Icons.star_rounded,
+                            color: Color(0xFFFFAB00),
+                            size: 24,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
                   Text(
                     'Score : ${_engine.score} pts • Altitude : ${_engine.altitudeMeters.toStringAsFixed(0)} m',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13.0,
+                      color: Color(0xFF2B1105),
+                      fontSize: 13.5,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
@@ -2433,9 +2966,9 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                     'Seed #${_engine.seed} • Record du Seed : $seedBest pts ($seedBestAlt m)',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: Color(0xFFFFE082),
+                      color: Color(0xFFD81B60),
                       fontSize: 10.5,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -2443,8 +2976,9 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                     'Fleurs Blossom : ${_engine.runBlossomsCollected} • Rebonds Parfaits : ${_engine.totalPerfectBouncesInRun}',
                     textAlign: TextAlign.center,
                     style: const TextStyle(
-                      color: Colors.white70,
+                      color: Color(0xFF5D4037),
                       fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
@@ -2457,29 +2991,28 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                   flex: 6,
                   child: Juicy3DGameButton(
                     key: const Key('gameover_replay_current_seed_button'),
-                    minHeight: 48.0,
+                    minHeight: 50.0,
                     haptic: GameHapticKind.heavy,
-                    backgroundColor: const Color(0xFFFFD700),
-                    lipColor: const Color(0xFF9E6B14),
-                    borderColor: const Color(0xFFFFFFFF),
-                    borderRadius: 16.0,
-                    lipDepth: 4.5,
+                    backgroundColor: const Color(0xFF76FF03),
+                    lipColor: const Color(0xFF33691E),
+                    borderColor: const Color(0xFF2B1105),
+                    borderRadius: 20.0,
+                    lipDepth: 5.5,
                     onTap: () => _engine.replaySeed(_engine.seed),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        const Icon(
-                          Icons.replay,
-                          color: Color(0xFF0E1E16),
-                          size: 16,
+                        const CartoonEmblemBadge(
+                          kind: CartoonEmblemKind.playTriangle,
+                          size: 18,
                         ),
-                        const SizedBox(width: 5),
+                        const SizedBox(width: 6),
                         Flexible(
                           child: Text(
                             'REJOUER SEED #${_engine.seed}',
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              color: Color(0xFF0E1E16),
+                              color: Color(0xFF2B1105),
                               fontSize: 10.5,
                               fontWeight: FontWeight.w900,
                             ),
@@ -2494,18 +3027,18 @@ class _VivienneJumpHomeScreenState extends State<VivienneJumpHomeScreen>
                   flex: 4,
                   child: Juicy3DGameButton(
                     key: const Key('gameover_open_menu_button'),
-                    minHeight: 48.0,
+                    minHeight: 50.0,
                     haptic: GameHapticKind.medium,
-                    backgroundColor: const Color(0xFF214030),
-                    lipColor: const Color(0xFF0B1811),
-                    borderColor: const Color(0xFFFFD700),
-                    borderRadius: 16.0,
-                    lipDepth: 4.5,
+                    backgroundColor: const Color(0xFF29B6F6),
+                    lipColor: const Color(0xFF0277BD),
+                    borderColor: const Color(0xFF2B1105),
+                    borderRadius: 20.0,
+                    lipDepth: 5.5,
                     onTap: () => _engine.openMainMenu(),
                     child: const Text(
                       'CHANGER SEED',
                       style: TextStyle(
-                        color: Color(0xFFFFD700),
+                        color: Colors.white,
                         fontSize: 9.5,
                         fontWeight: FontWeight.w900,
                       ),

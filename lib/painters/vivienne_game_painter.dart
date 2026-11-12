@@ -1144,24 +1144,6 @@ class VivienneGamePainter extends CustomPainter {
           ..lineTo(rect.center.dx + 5.5, cy + 3.0);
         canvas.drawPath(chev, chevronPaint);
       }
-
-      _drawPlatformMicroBadge(
-        canvas,
-        Offset(rect.center.dx, rect.bottom + 1.5),
-        'SUPER ×1.45',
-        bgColor: const Color(0xFFFFD700),
-        borderColor: const Color(0xFFFFFFFF),
-        textColor: const Color(0xFF1A1105),
-      );
-    } else {
-      _drawPlatformMicroBadge(
-        canvas,
-        Offset(rect.center.dx, rect.bottom + 1.0),
-        'STABLE ×1.0',
-        bgColor: const Color(0xDD2B1D14),
-        borderColor: const Color(0xFFFFE082),
-        textColor: const Color(0xFFFFE082),
-      );
     }
   }
 
@@ -1217,15 +1199,6 @@ class VivienneGamePainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.6,
     );
-
-    _drawPlatformMicroBadge(
-      canvas,
-      Offset(rect.center.dx, rect.bottom + 1.2),
-      'MOBILE ×1.14',
-      bgColor: const Color(0xEE8B1E24),
-      borderColor: const Color(0xFFFFD700),
-      textColor: const Color(0xFFFFF59D),
-    );
   }
 
   void _paintSilkBlossomPlatform(Canvas canvas, Rect rect) {
@@ -1276,15 +1249,6 @@ class VivienneGamePainter extends CustomPainter {
         ..color = const Color(0xFFFFD700)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.2,
-    );
-
-    _drawPlatformMicroBadge(
-      canvas,
-      Offset(rect.center.dx, rect.bottom + 1.2),
-      '1× REBOND',
-      bgColor: const Color(0xEEAD1457),
-      borderColor: const Color(0xFFFFF0F5),
-      textColor: const Color(0xFFFFFFFF),
     );
   }
 
@@ -1346,63 +1310,6 @@ class VivienneGamePainter extends CustomPainter {
     canvas.drawPath(
       downArrow,
       Paint()..color = const Color(0xFF00E5FF),
-    );
-
-    _drawPlatformMicroBadge(
-      canvas,
-      Offset(cloudRect.center.dx, cloudRect.bottom + 1.2),
-      'AMORTI ×0.85',
-      bgColor: const Color(0xEE01579B),
-      borderColor: const Color(0xFF80D8FF),
-      textColor: const Color(0xFFE1F5FE),
-    );
-  }
-
-  void _drawPlatformMicroBadge(
-    Canvas canvas,
-    Offset topCenter,
-    String text, {
-    required Color bgColor,
-    required Color borderColor,
-    required Color textColor,
-  }) {
-    final TextPainter tp = TextPainter(
-      text: TextSpan(
-        text: text,
-        style: TextStyle(
-          fontFamily: 'Roboto',
-          color: textColor,
-          fontSize: 7.5,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 0.3,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    )..layout();
-
-    final Rect pillRect = Rect.fromCenter(
-      center: Offset(topCenter.dx, topCenter.dy + 4.0),
-      width: tp.width + 8.0,
-      height: tp.height + 2.5,
-    );
-    final RRect pillRRect = RRect.fromRectAndRadius(
-      pillRect,
-      const Radius.circular(5),
-    );
-    canvas.drawRRect(pillRRect, Paint()..color = bgColor);
-    canvas.drawRRect(
-      pillRRect,
-      Paint()
-        ..color = borderColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 0.9,
-    );
-    tp.paint(
-      canvas,
-      Offset(
-        pillRect.center.dx - tp.width * 0.5,
-        pillRect.center.dy - tp.height * 0.5,
-      ),
     );
   }
 
@@ -1647,26 +1554,102 @@ class VivienneGamePainter extends CustomPainter {
   void _paintParticles(Canvas canvas) {
     for (final BlossomParticle p in engine.particles) {
       final double sy = p.y - engine.cameraY;
-      if (sy < -20.0 || sy > VivienneJumpEngine.worldHeight + 20.0) continue;
+      if (sy < -24.0 || sy > VivienneJumpEngine.worldHeight + 24.0) continue;
 
       final double alpha = (p.life / p.maxLife).clamp(0.0, 1.0);
-      final Paint paint = Paint()
-        ..color = p.color.withValues(alpha: alpha);
-      if (p.isPetal) {
-        canvas.save();
-        canvas.translate(p.x, sy);
-        canvas.rotate(p.rotation);
-        canvas.drawOval(
-          Rect.fromCenter(
-            center: Offset.zero,
-            width: p.size * 1.35,
-            height: p.size * 0.80,
-          ),
-          paint,
-        );
-        canvas.restore();
-      } else {
-        canvas.drawCircle(Offset(p.x, sy), p.size * 0.55, paint);
+      final Paint paint = Paint()..color = p.color.withValues(alpha: alpha);
+
+      switch (p.shape) {
+        case PlatformParticleShape.springUpdraftStar:
+          canvas.save();
+          canvas.translate(p.x, sy);
+          canvas.rotate(p.rotation * 0.6);
+          canvas.scale(1.0, p.stretchFactor);
+          _drawStarBlossomMotif(
+            canvas,
+            Offset.zero,
+            p.size * (0.45 + 0.45 * alpha),
+            paint,
+            Paint()
+              ..color = Colors.white.withValues(alpha: alpha * 0.85)
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 0.9,
+          );
+          canvas.restore();
+
+        case PlatformParticleShape.cloudCushionPuff:
+          final double puffRadius = p.size * (0.55 + (1.0 - alpha) * 0.45);
+          canvas.drawCircle(
+            Offset(p.x, sy),
+            puffRadius,
+            Paint()..color = p.color.withValues(alpha: alpha * 0.72),
+          );
+          canvas.drawCircle(
+            Offset(p.x - puffRadius * 0.35, sy - puffRadius * 0.2),
+            puffRadius * 0.55,
+            Paint()..color = Colors.white.withValues(alpha: alpha * 0.80),
+          );
+
+        case PlatformParticleShape.silkPetalFlutter:
+          canvas.save();
+          canvas.translate(p.x, sy);
+          canvas.rotate(p.rotation);
+          canvas.drawOval(
+            Rect.fromCenter(
+              center: Offset.zero,
+              width: p.size * 1.45,
+              height: p.size * 0.78,
+            ),
+            paint,
+          );
+          canvas.restore();
+
+        case PlatformParticleShape.kineticStrapTrail:
+          canvas.save();
+          canvas.translate(p.x, sy);
+          final double velAngle = math.atan2(p.vy, p.vx);
+          canvas.rotate(velAngle);
+          canvas.drawRRect(
+            RRect.fromRectAndRadius(
+              Rect.fromCenter(
+                center: Offset.zero,
+                width: p.size * p.stretchFactor,
+                height: p.size * 0.48,
+              ),
+              Radius.circular(p.size * 0.24),
+            ),
+            paint,
+          );
+          canvas.restore();
+
+        case PlatformParticleShape.brassSpark:
+          if (p.isPetal) {
+            canvas.save();
+            canvas.translate(p.x, sy);
+            canvas.rotate(p.rotation);
+            canvas.drawOval(
+              Rect.fromCenter(
+                center: Offset.zero,
+                width: p.size * 1.35,
+                height: p.size * 0.80,
+              ),
+              paint,
+            );
+            canvas.restore();
+          } else {
+            canvas.save();
+            canvas.translate(p.x, sy);
+            canvas.rotate(p.rotation);
+            final double r = p.size * 0.62;
+            final Path diamond = Path()
+              ..moveTo(0, -r)
+              ..lineTo(r * 0.65, 0)
+              ..lineTo(0, r)
+              ..lineTo(-r * 0.65, 0)
+              ..close();
+            canvas.drawPath(diamond, paint);
+            canvas.restore();
+          }
       }
     }
   }

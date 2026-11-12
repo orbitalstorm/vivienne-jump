@@ -461,7 +461,25 @@ class LvAtelierHazard {
   double phase;
 }
 
-/// Visual particle (golden sparkles, Vachetta petals, Monogram stars).
+/// Visual and physical archetype for platform-bounce and collectible particles.
+enum PlatformParticleShape {
+  /// Crisp 4-point brass/gold spark with heavy parabolic gravity (`monogramTrunk`).
+  brassSpark,
+
+  /// High-velocity ascending 24K gold star/ring with upward anti-gravity (`springLockGold`).
+  springUpdraftStar,
+
+  /// Soft cushioned cloud puff expanding horizontally with viscous air drag (`damierCloud`).
+  cloudCushionPuff,
+
+  /// Delicate silk petal fluttering with low gravity and sinusoidal lateral sway (`silkBlossomFragile`).
+  silkPetalFlutter,
+
+  /// Sleek directional leather/gold velocity streak inheriting rail momentum (`vachettaStrapMoving`).
+  kineticStrapTrail,
+}
+
+/// Visual particle with platform-specific physics (gravity scale, air drag, sinusoidal swirl, stretch).
 class BlossomParticle {
   BlossomParticle({
     required this.x,
@@ -474,6 +492,13 @@ class BlossomParticle {
     required this.maxLife,
     this.isPetal = false,
     this.rotation = 0.0,
+    this.shape = PlatformParticleShape.brassSpark,
+    this.gravityScale = 1.0,
+    this.drag = 0.0,
+    this.swirlAmplitude = 0.0,
+    this.swirlFrequency = 0.0,
+    this.swirlPhase = 0.0,
+    this.stretchFactor = 1.0,
   });
 
   double x;
@@ -486,6 +511,13 @@ class BlossomParticle {
   final double maxLife;
   final bool isPetal;
   double rotation;
+  final PlatformParticleShape shape;
+  final double gravityScale;
+  final double drag;
+  final double swirlAmplitude;
+  final double swirlFrequency;
+  double swirlPhase;
+  final double stretchFactor;
 }
 
 /// Floating score/combo callout text in the arena.

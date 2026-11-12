@@ -1,5 +1,22 @@
 # Changelog — VIVIENNE : L'Odyssée Blossom
 
+## `v1.3.0` (2026-11-12) — Disparition des Plateformes Hors Écran, Physique de Particules par Plateforme & Refonte Menu Cartoon (`ORB-54`, `ORB-56`, `ORB-57`)
+
+- **Gameplay — Disparition Immédiate des Plateformes Sortant par le Bas de l'Écran (`lib/engine/vivienne_jump_engine.dart`)** :
+  - Résolution de la cause racine où la marge de nettoyage sous caméra (`+150 px`) laissait des plateformes actives hors champ : introduction du prédicat strict `isPlatformBelowScreen(LvPlatform plat)` (`plat.y >= cameraY + worldHeight || (plat.y - plat.height * 0.5) >= cameraY + worldHeight`).
+  - Suppression immédiate (`platforms.removeWhere(isPlatformBelowScreen)`) avant et après la physique et exclusion explicite dans la boucle de collision : **toute plateforme qui sort de l'écran en bas disparaît instantanément et il est strictement impossible de rebondir dessus**.
+- **UI & Canvas — Masquage des Descriptions de Plateformes & Physique de Particules de Rebond Dédiée (`PlatformParticleShape`)** :
+  - **Masquage intégral des descriptions de plateformes** : suppression des cartouches texte sous les plateformes sur le Canvas (`_drawPlatformMicroBadge`), suppression du 3e bandeau descriptif de plateforme dans le HUD supérieur, suppression du guide textuel sur l'écran d'accueil, suppression des callouts textuels verbeux au rebond et masquage de `p.description` / `p.shortEffectLabel` dans l'Herbier.
+  - **Physique de particules légère (`8..12` particules) et dynamique adaptée à chaque type de plateforme (`_spawnPlatformBounceParticles`)** :
+    1. **Malle Monogram Ébène (`brassSpark`)** : 8 étincelles losanges or/laiton en éventail latéral franc soumises à une gravité parabolique lourde (`gravityScale: 1.25`, `drag: 1.8`).
+    2. **Malle à Serrure Ressort Or 24K (`springUpdraftStar`)** : 12 étoiles Or 24K propulsées en colonne verticale à gravité inversée (`gravityScale: -0.35`, `stretchFactor: 1.65`, `swirlAmplitude: 22.0`).
+    3. **Nuage Damier Amorti (`cloudCushionPuff`)** : 10 bouffées vaporeuses bleu glacier/blanc s'écrasant latéralement avec fort amortissement visqueux (`drag: 5.2`) et flottaison douce (`gravityScale: -0.20`).
+    4. **Pétale de Soie Blossom Éphémère (`silkPetalFlutter`)** : 12 pétales de soie à chute lente (`gravityScale: 0.28`) et oscillation sinusoïdale latérale de feuille morte (`swirlAmplitude: 62.0`, `swirlFrequency: 8.8`).
+    5. **Lanière Cuir Vachetta Mobile (`kineticStrapTrail`)** : 9 sillages cinétiques fuselés cuir/or couplés à l'inertie du rail (`vx` hérite de `-plat.vx * 1.35`, `stretchFactor: 1.90`, `gravityScale: 0.65`).
+- **Refonte Radicale du Menu en Style Cartoon (*Angry Birds / Candy Crush*) & Assets Vectoriels (`ORB-56` [@Leonardo] & `ORB-57` [@Miyamoto])** :
+  - Génération de 4 assets vectoriels SVG haute précision (`assets/cartoon/cartoon_trophy_cup.svg`, `cartoon_crown_edition.svg`, `cartoon_blossom_star.svg`, `cartoon_cube_3d.svg`) et du moteur vectoriel `CartoonEmblemBadge` (`lib/painters/vivienne_cartoon_assets.dart`) à contours épais `#2B1105`, dégradés multi-plans et reflets spéculaires.
+  - Transformation de l'écran d'accueil, de l'écran Fin d'Ascension, du HUD et des sous-menus (`ÉDITIONS`, `HERBIER`, `STUDIO 3D`, `SCORES`) en interface **Cartoon Pop** (panneaux parchemin `#FFF8E7` à bordures épaisses `#2B1105`, bannières ruban rose bonbon `#FF4081`, gros boutons 3D vert lime `#76FF03` / or `#FFD700` / azur `#29B6F6` avec reflet glossy supérieur, ouverture modale élastique `CartoonBouncyModal` `Curves.elasticOut` et étoiles de classement).
+
 ## `v1.2.0` (2026-11-12) — Refonte UI Mobile Store Pro, 5 Plateformes à Effets Physiques Francs & Tableau des Scores par Seed (`ORB-52`, `ORB-53`)
 
 - **Analyse Game Design & 5 Archétypes de Plateformes à Effets Clairs (< 100 ms)** :

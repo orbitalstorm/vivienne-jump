@@ -138,6 +138,57 @@ void main() {
       expect(engine.seed, equals(1854));
       expect(engine.isInMenu, isFalse);
       expect(engine.isGameOver, isFalse);
+
+      // Verify a platform exiting the bottom of the screen disappears immediately and cannot be bounced on
+      final LvPlatform bottomPlat = engine.platforms.first;
+      engine.cameraY = bottomPlat.y - VivienneJumpEngine.worldHeight - 2.0;
+      engine.playerX = bottomPlat.x;
+      engine.playerY = bottomPlat.y - 40.0;
+      engine.playerVy = 420.0; // falling down toward off-screen bottomPlat
+      engine.update(1 / 60);
+      expect(
+        engine.platforms.any((LvPlatform p) => p.id == bottomPlat.id),
+        isFalse,
+      );
+      expect(engine.playerVy, greaterThan(0.0)); // did NOT bounce on off-screen platform
+
+      // Verify each of the 5 platform types spawns its dedicated particle physics shape on bounce
+      final Map<LvPlatformType, PlatformParticleShape> expectedShapes =
+          <LvPlatformType, PlatformParticleShape>{
+            LvPlatformType.monogramTrunk: PlatformParticleShape.brassSpark,
+            LvPlatformType.springLockGold:
+                PlatformParticleShape.springUpdraftStar,
+            LvPlatformType.damierCloud: PlatformParticleShape.cloudCushionPuff,
+            LvPlatformType.silkBlossomFragile:
+                PlatformParticleShape.silkPetalFlutter,
+            LvPlatformType.vachettaStrapMoving:
+                PlatformParticleShape.kineticStrapTrail,
+          };
+      for (final MapEntry<LvPlatformType, PlatformParticleShape> entry
+          in expectedShapes.entries) {
+        engine.resetRun(seed: 777);
+        engine.particles.clear();
+        final LvPlatform testPlat = LvPlatform(
+          id: 9999,
+          stepIndex: 99,
+          x: 210.0,
+          y: 500.0,
+          width: 80.0,
+          height: 17.0,
+          type: entry.key,
+          vx: entry.key.movesHorizontally ? 65.0 : 0.0,
+        );
+        engine.platforms.insert(0, testPlat);
+        engine.playerX = 210.0;
+        engine.playerY = 500.0 - 17.0 * 0.5 - 35.0;
+        engine.playerVy = 260.0;
+        engine.update(1 / 60);
+        expect(
+          engine.particles.any((BlossomParticle p) => p.shape == entry.value),
+          isTrue,
+          reason: 'Expected ${entry.value} particle on bounce for ${entry.key}',
+        );
+      }
     },
   );
 
@@ -273,6 +324,10 @@ void main() {
       expect(find.textContaining('INCLINAISON'), findsOneWidget);
       expect(find.textContaining('SEED 777'), findsOneWidget);
       expect(find.text('SCORES'), findsOneWidget);
+      expect(
+        find.textContaining(LvPlatformType.monogramTrunk.shortEffectLabel),
+        findsNothing,
+      );
 
       // 1. Verify Store Menu & Seed Leaderboard before starting a run
       await tester.tap(find.byKey(const Key('open_menu_leaderboard_button')));
@@ -283,6 +338,10 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('REJOUER CE SEED'), findsWidgets);
+      expect(
+        find.textContaining(LvPlatformType.monogramTrunk.shortEffectLabel),
+        findsNothing,
+      );
 
       await tester.runAsync(
         () => _capturePortraitScreenshot(
@@ -404,6 +463,15 @@ void main() {
       expect(
         find.textContaining('HERBIER BLOSSOM'),
         findsOneWidget,
+      );
+      expect(find.text(LvPlatformType.monogramTrunk.title), findsOneWidget);
+      expect(
+        find.textContaining(LvPlatformType.monogramTrunk.shortEffectLabel),
+        findsNothing,
+      );
+      expect(
+        find.textContaining(LvPlatformType.monogramTrunk.description),
+        findsNothing,
       );
       await tester.runAsync(
         () => _capturePortraitScreenshot(

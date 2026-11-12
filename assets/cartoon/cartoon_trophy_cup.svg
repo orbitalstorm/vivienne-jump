@@ -1,0 +1,208 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- 24K Gold Multi-Planar Gradients -->
+    <linearGradient id="trophy-gold-main" x1="0%" y1="0%" x2="100%" y2="85%">
+      <stop offset="0%" stop-color="#FFFDE7" />
+      <stop offset="22%" stop-color="#FFE57F" />
+      <stop offset="55%" stop-color="#FFC107" />
+      <stop offset="82%" stop-color="#FF8F00" />
+      <stop offset="100%" stop-color="#C66900" />
+    </linearGradient>
+
+    <linearGradient id="trophy-gold-shadow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB300" />
+      <stop offset="60%" stop-color="#E65100" />
+      <stop offset="100%" stop-color="#8D3200" />
+    </linearGradient>
+
+    <linearGradient id="trophy-gold-rim" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFF59D" />
+      <stop offset="35%" stop-color="#FFFFFF" />
+      <stop offset="70%" stop-color="#FFD54F" />
+      <stop offset="100%" stop-color="#FF6F00" />
+    </linearGradient>
+
+    <radialGradient id="trophy-cavity" cx="50%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#B25900" />
+      <stop offset="65%" stop-color="#7A3300" />
+      <stop offset="100%" stop-color="#4A1C00" />
+    </radialGradient>
+
+    <linearGradient id="trophy-pedestal-wood" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6D4C41" />
+      <stop offset="45%" stop-color="#4E342E" />
+      <stop offset="100%" stop-color="#27140E" />
+    </linearGradient>
+
+    <linearGradient id="trophy-star-grad" x1="20%" y1="10%" x2="85%" y2="90%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="45%" stop-color="#FFF59D" />
+      <stop offset="100%" stop-color="#FFA000" />
+    </linearGradient>
+
+    <radialGradient id="ruby-gem" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#FF8A80" />
+      <stop offset="45%" stop-color="#FF1744" />
+      <stop offset="100%" stop-color="#880E4F" />
+    </radialGradient>
+
+    <clipPath id="cup-body-clip">
+      <path d="M 132 116 L 380 116 C 378 242 330 302 256 312 C 182 302 134 242 132 116 Z" />
+    </clipPath>
+  </defs>
+
+  <!-- CALQUE 1 : BASE SHADOW & SILHOUETTE OFFSET -->
+  <g id="base-shadow">
+    <!-- Ground Ambient Shadow -->
+    <ellipse cx="256" cy="466" rx="146" ry="24" fill="#2B1105" opacity="0.28" />
+    <ellipse cx="256" cy="464" rx="112" ry="15" fill="#2B1105" opacity="0.42" />
+
+    <!-- Cartoon Sticker Offset Drop Silhouette -->
+    <path d="M 118 106 L 394 106 C 394 128 386 138 382 142 C 424 142 454 176 446 220 C 438 264 392 292 340 288 C 322 304 300 314 282 318 L 288 370 L 340 370 C 354 370 364 380 364 394 L 364 406 L 380 406 C 394 406 404 416 404 430 L 404 456 C 404 468 394 476 380 476 L 132 476 C 118 476 108 468 108 456 L 108 430 C 108 416 118 406 132 406 L 148 406 L 148 394 C 148 380 158 370 172 370 L 224 370 L 230 318 C 212 314 190 304 172 288 C 120 292 74 264 66 220 C 58 176 88 142 130 142 C 126 138 118 128 118 106 Z"
+          fill="#2B1105" transform="translate(0, 8)" opacity="0.35" />
+  </g>
+
+  <!-- CALQUE 2 & 3 : MAIN BODY, SUB-ASSEMBLIES & MICRO-DETAILS -->
+  <g id="main-body">
+    <!-- Sculpted Left Handle (Anse Volute Gauche) -->
+    <g id="handle-left">
+      <path d="M 142 144 C 84 134 54 172 64 218 C 74 262 126 286 184 276 L 178 246 C 138 252 104 236 98 208 C 92 182 112 166 144 172 Z"
+            fill="url(#trophy-gold-main)" stroke="#2B1105" stroke-width="14" stroke-linejoin="round" />
+      <!-- Handle Inner Bevel Shadow -->
+      <path d="M 138 156 C 94 150 74 178 80 212 C 86 244 126 266 176 260"
+            fill="none" stroke="#B25900" stroke-width="6" stroke-linecap="round" />
+      <!-- Decorative Handle Volute Bead -->
+      <circle cx="72" cy="184" r="14" fill="url(#trophy-gold-main)" stroke="#2B1105" stroke-width="10" />
+    </g>
+
+    <!-- Sculpted Right Handle (Anse Volute Droite) -->
+    <g id="handle-right">
+      <path d="M 370 144 C 428 134 458 172 448 218 C 438 262 386 286 328 276 L 334 246 C 374 252 408 236 414 208 C 420 182 400 166 368 172 Z"
+            fill="url(#trophy-gold-shadow)" stroke="#2B1105" stroke-width="14" stroke-linejoin="round" />
+      <path d="M 374 156 C 418 150 438 178 432 212 C 426 244 386 266 336 260"
+            fill="none" stroke="#FFE57F" stroke-width="5" stroke-linecap="round" />
+      <circle cx="440" cy="184" r="14" fill="url(#trophy-gold-shadow)" stroke="#2B1105" stroke-width="10" />
+    </g>
+
+    <!-- Turned Stem & Collar Rings (Pied & Bagues d'Articulation) -->
+    <g id="trophy-stem">
+      <path d="M 226 300 L 286 300 L 298 374 L 214 374 Z"
+            fill="url(#trophy-gold-main)" stroke="#2B1105" stroke-width="14" stroke-linejoin="round" />
+      <!-- Shadow Plane on Right Side of Stem -->
+      <path d="M 256 304 L 282 304 L 292 370 L 256 370 Z" fill="#C66900" opacity="0.55" />
+      <!-- Upper Collar Ring -->
+      <rect x="210" y="302" width="92" height="24" rx="12"
+            fill="url(#trophy-gold-rim)" stroke="#2B1105" stroke-width="12" />
+      <!-- Lower Collar Ring -->
+      <rect x="196" y="352" width="120" height="24" rx="12"
+            fill="url(#trophy-gold-rim)" stroke="#2B1105" stroke-width="12" />
+    </g>
+
+    <!-- Tiered Pedestal Base (Socle Étagé) -->
+    <g id="trophy-pedestal">
+      <!-- Gold Step Molding -->
+      <rect x="152" y="372" width="208" height="34" rx="12"
+            fill="url(#trophy-gold-main)" stroke="#2B1105" stroke-width="14" stroke-linejoin="round" />
+      <!-- Ebony/Mahogany Plinth -->
+      <rect x="114" y="402" width="284" height="62" rx="16"
+            fill="url(#trophy-pedestal-wood)" stroke="#2B1105" stroke-width="14" stroke-linejoin="round" />
+      <!-- Pedestal Shadow Band -->
+      <path d="M 122 444 L 390 444 C 390 454 384 458 374 458 L 138 458 C 128 458 122 454 122 444 Z"
+            fill="#1A0B05" opacity="0.65" />
+      <!-- Golden Championship Plaque -->
+      <rect x="174" y="416" width="164" height="34" rx="8"
+            fill="url(#trophy-gold-rim)" stroke="#2B1105" stroke-width="9" />
+      <!-- Plaque Rivets -->
+      <circle cx="190" cy="433" r="4.5" fill="#2B1105" />
+      <circle cx="322" cy="433" r="4.5" fill="#2B1105" />
+      <!-- Plaque Center Ruby Gem -->
+      <circle cx="256" cy="433" r="9" fill="url(#ruby-gem)" stroke="#2B1105" stroke-width="5" />
+    </g>
+
+    <!-- Main Chalice Bowl (Vasque Principale Multi-Plans) -->
+    <g id="chalice-bowl">
+      <!-- Base Golden Chalice Silhouette -->
+      <path d="M 132 116 L 380 116 C 378 242 330 302 256 312 C 182 302 134 242 132 116 Z"
+            fill="url(#trophy-gold-main)" />
+
+      <!-- Multi-Layered Cel-Shaded Planes clipped to Bowl -->
+      <g clip-path="url(#cup-body-clip)">
+        <!-- Left Sunlit Warm Plane -->
+        <path d="M 130 110 L 222 110 C 218 228 196 286 244 314 L 130 314 Z"
+              fill="#FFF59D" opacity="0.52" />
+        <!-- Right Deep Amber Occlusion Plane -->
+        <path d="M 304 110 L 386 110 L 386 316 L 256 316 C 306 290 312 224 304 110 Z"
+              fill="url(#trophy-gold-shadow)" opacity="0.78" />
+        <!-- Sub-Rim Cast Shadow Band -->
+        <path d="M 124 126 Q 256 154 388 126 L 388 148 Q 256 176 124 148 Z"
+              fill="#8D3200" opacity="0.45" />
+        <!-- Decorative Engraved Waist Fluting Band -->
+        <path d="M 140 248 Q 256 276 372 248"
+              fill="none" stroke="#8D3200" stroke-width="8" opacity="0.55" />
+        <path d="M 142 255 Q 256 283 370 255"
+              fill="none" stroke="#FFF9C4" stroke-width="5" opacity="0.75" />
+      </g>
+
+      <!-- Outer Heavy Contour of the Chalice Bowl -->
+      <path d="M 132 116 L 380 116 C 378 242 330 302 256 312 C 182 302 134 242 132 116 Z"
+            fill="none" stroke="#2B1105" stroke-width="15" stroke-linejoin="round" />
+
+      <!-- Top Lip Rim & Inner Cavity (Rebord Supérieur & Cavité) -->
+      <ellipse cx="256" cy="112" rx="136" ry="30"
+               fill="url(#trophy-gold-rim)" stroke="#2B1105" stroke-width="14" />
+      <ellipse cx="256" cy="110" rx="108" ry="18"
+               fill="url(#trophy-cavity)" stroke="#2B1105" stroke-width="8" />
+
+      <!-- Central Embossed Star & Blossom Emblem -->
+      <g id="central-star-emblem">
+        <!-- Star Drop Shadow -->
+        <polygon points="256,154 273,190 312,195 283,222 291,261 256,242 221,261 229,222 200,195 239,190"
+                 fill="#8D3200" transform="translate(0, 6)" opacity="0.55" />
+        <!-- Star Main Faceted Body -->
+        <polygon points="256,154 273,190 312,195 283,222 291,261 256,242 221,261 229,222 200,195 239,190"
+                 fill="url(#trophy-star-grad)" stroke="#2B1105" stroke-width="10" stroke-linejoin="round" />
+        <!-- Star Internal Bevel Lines -->
+        <line x1="256" y1="154" x2="256" y2="210" stroke="#2B1105" stroke-width="4" stroke-linecap="round" />
+        <line x1="312" y1="195" x2="256" y2="210" stroke="#2B1105" stroke-width="4" stroke-linecap="round" />
+        <line x1="291" y1="261" x2="256" y2="210" stroke="#2B1105" stroke-width="4" stroke-linecap="round" />
+        <line x1="221" y1="261" x2="256" y2="210" stroke="#2B1105" stroke-width="4" stroke-linecap="round" />
+        <line x1="200" y1="195" x2="256" y2="210" stroke="#2B1105" stroke-width="4" stroke-linecap="round" />
+        <!-- Center Blossom Ruby Cabochon -->
+        <circle cx="256" cy="210" r="12" fill="url(#ruby-gem)" stroke="#2B1105" stroke-width="6" />
+      </g>
+    </g>
+  </g>
+
+  <!-- CALQUE 4 : HARD-EDGED SPECULAR HIGHLIGHTS & SPARKLES -->
+  <g id="specular-highlights">
+    <!-- Main Left Curved Specular Slash on Cup -->
+    <path d="M 158 148 L 182 148 C 182 206 196 250 218 278 L 198 282 C 172 252 158 206 158 148 Z"
+          fill="#FFFFFF" opacity="0.88" />
+    <!-- Specular Dot Below Slash -->
+    <circle cx="215" cy="292" r="7" fill="#FFFFFF" opacity="0.88" />
+
+    <!-- Lip Rim Specular Arc -->
+    <path d="M 146 106 Q 204 88 268 92"
+          fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.92" />
+
+    <!-- Left Handle Specular Highlight -->
+    <path d="M 80 168 C 68 184 68 208 78 228"
+          fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" opacity="0.85" />
+
+    <!-- Stem & Pedestal Crisp Highlights -->
+    <line x1="222" y1="312" x2="252" y2="312" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+    <line x1="210" y1="362" x2="246" y2="362" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" />
+    <line x1="168" y1="384" x2="232" y2="384" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" opacity="0.9" />
+    <line x1="134" y1="414" x2="196" y2="414" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" opacity="0.45" />
+
+    <!-- Ruby Gem Glints -->
+    <circle cx="252" cy="206" r="3.5" fill="#FFFFFF" />
+    <circle cx="253" cy="430" r="2.8" fill="#FFFFFF" />
+
+    <!-- Cartoon Four-Point Victory Sparkles -->
+    <path d="M 106 72 L 114 92 L 134 100 L 114 108 L 106 128 L 98 108 L 78 100 L 98 92 Z"
+          fill="#FFFFFF" stroke="#2B1105" stroke-width="6" stroke-linejoin="round" />
+    <path d="M 412 84 L 418 98 L 432 104 L 418 110 L 412 124 L 406 110 L 392 104 L 406 98 Z"
+          fill="#FFF59D" stroke="#2B1105" stroke-width="5" stroke-linejoin="round" />
+  </g>
+</svg>

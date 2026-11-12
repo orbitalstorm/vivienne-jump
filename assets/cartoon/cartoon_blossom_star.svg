@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Candy-Glazed Sakura Blossom Gradients -->
+    <radialGradient id="blossom-candy-body" cx="38%" cy="32%" r="68%">
+      <stop offset="0%" stop-color="#FFF0F6" />
+      <stop offset="28%" stop-color="#FF80AB" />
+      <stop offset="65%" stop-color="#F50057" />
+      <stop offset="90%" stop-color="#AD1457" />
+      <stop offset="100%" stop-color="#6A0032" />
+    </radialGradient>
+
+    <radialGradient id="blossom-inner-pillow" cx="42%" cy="36%" r="58%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="35%" stop-color="#FFB2DD" />
+      <stop offset="78%" stop-color="#FF4081" />
+      <stop offset="100%" stop-color="#C51162" />
+    </radialGradient>
+
+    <!-- Golden Star Calyx & Nectar Stamen Gradients -->
+    <linearGradient id="blossom-gold-rays" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDE7" />
+      <stop offset="40%" stop-color="#FFD740" />
+      <stop offset="80%" stop-color="#FF8F00" />
+      <stop offset="100%" stop-color="#C65100" />
+    </linearGradient>
+
+    <radialGradient id="blossom-nectar-core" cx="35%" cy="30%" r="68%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="30%" stop-color="#FFF59D" />
+      <stop offset="68%" stop-color="#FFC107" />
+      <stop offset="100%" stop-color="#E65100" />
+    </radialGradient>
+  </defs>
+
+  <!-- CALQUE 1 : BASE SHADOW & CANDY STICKER SILHOUETTE -->
+  <g id="base-shadow">
+    <!-- Soft Ambient Ground Glow/Shadow -->
+    <ellipse cx="256" cy="468" rx="134" ry="22" fill="#2B1105" opacity="0.26" />
+    <ellipse cx="256" cy="466" rx="98" ry="13" fill="#2B1105" opacity="0.4" />
+
+    <!-- Offset Cartoon Drop Shadow of Star + Petals -->
+    <g transform="translate(0, 12)" opacity="0.34">
+      <path d="M 256 36 C 314 36 346 92 340 150 L 410 102 L 362 172 C 420 166 476 198 476 256 C 476 314 420 346 362 340 L 410 410 L 340 362 C 346 420 314 476 256 476 C 198 476 166 420 172 362 L 102 410 L 150 340 C 92 346 36 314 36 256 C 36 198 92 166 150 172 L 102 102 L 172 150 C 166 92 198 36 256 36 Z"
+            fill="#2B1105" />
+    </g>
+  </g>
+
+  <!-- CALQUE 2 & 3 : MAIN BODY, SUB-ASSEMBLIES & MICRO-DETAILS -->
+  <g id="main-body">
+    <!-- Diagonal Golden Star Rays (Étoile Dorée Englobeuse) -->
+    <g id="golden-diagonal-rays">
+      <polygon points="256,196 414,98 316,256 414,414 256,316 98,414 196,256 98,98"
+               fill="url(#blossom-gold-rays)" stroke="#2B1105" stroke-width="15" stroke-linejoin="round" />
+      <!-- Inner Facet Ridges on Diagonal Rays -->
+      <line x1="98" y1="98" x2="414" y2="414" stroke="#B25900" stroke-width="6" />
+      <line x1="414" y1="98" x2="98" y2="414" stroke="#B25900" stroke-width="6" />
+      <!-- Golden Corner Beads -->
+      <circle cx="96" cy="96" r="14" fill="url(#blossom-nectar-core)" stroke="#2B1105" stroke-width="10" />
+      <circle cx="416" cy="96" r="14" fill="url(#blossom-nectar-core)" stroke="#2B1105" stroke-width="10" />
+      <circle cx="416" cy="416" r="14" fill="url(#blossom-nectar-core)" stroke="#2B1105" stroke-width="10" />
+      <circle cx="96" cy="416" r="14" fill="url(#blossom-nectar-core)" stroke="#2B1105" stroke-width="10" />
+    </g>
+
+    <!-- 4 Puffy Candy-Glazed Monogram Blossom Petals (Fleur Bombée Candy Crush) -->
+    <g id="candy-blossom-petals">
+      <!-- Outer Candy Shell Contour -->
+      <path d="M 256 38
+               C 320 38 352 104 330 182
+               C 408 160 474 192 474 256
+               C 474 320 408 352 330 330
+               C 352 408 320 474 256 474
+               C 192 474 160 408 182 330
+               C 104 352 38 320 38 256
+               C 38 192 104 160 182 182
+               C 160 104 192 38 256 38 Z"
+            fill="url(#blossom-candy-body)" stroke="#2B1105" stroke-width="16" stroke-linejoin="round" />
+
+      <!-- Bottom Carmine Candy Rim Occlusion (3D Bevel Depth) -->
+      <path d="M 46 266 C 54 316 112 342 182 322 C 164 396 196 462 256 462 C 316 462 348 396 330 322 C 400 342 458 316 466 266 C 454 310 398 330 324 312 C 342 384 310 444 256 444 C 202 444 170 384 188 312 C 114 330 58 310 46 266 Z"
+            fill="#6A0032" opacity="0.62" />
+
+      <!-- Inner Pillowed Jelly Layer (Subsurface Candy Glow) -->
+      <path d="M 256 68
+               C 302 68 324 118 308 188
+               C 378 172 444 198 444 256
+               C 444 314 378 340 308 324
+               C 324 394 302 444 256 444
+               C 210 444 188 394 204 324
+               C 134 340 68 314 68 256
+               C 68 198 134 172 204 188
+               C 188 118 210 68 256 68 Z"
+            fill="url(#blossom-inner-pillow)" stroke="#FF80AB" stroke-width="5" opacity="0.88" />
+
+      <!-- Subtle Petal Crease Lines radiating from Center -->
+      <line x1="256" y1="98" x2="256" y2="178" stroke="#AD1457" stroke-width="6" stroke-linecap="round" opacity="0.55" />
+      <line x1="256" y1="334" x2="256" y2="414" stroke="#AD1457" stroke-width="6" stroke-linecap="round" opacity="0.55" />
+      <line x1="98" y1="256" x2="178" y2="256" stroke="#AD1457" stroke-width="6" stroke-linecap="round" opacity="0.55" />
+      <line x1="334" y1="256" x2="414" y2="256" stroke="#AD1457" stroke-width="6" stroke-linecap="round" opacity="0.55" />
+    </g>
+
+    <!-- Central Golden Stamen Medallion (Cœur Nectar Doré) -->
+    <g id="central-stamen">
+      <!-- Medallion Cast Shadow -->
+      <circle cx="256" cy="264" r="72" fill="#6A0032" opacity="0.5" />
+      <!-- Scalloped Gold Bezel Ring -->
+      <circle cx="256" cy="256" r="70" fill="url(#blossom-gold-rays)" stroke="#2B1105" stroke-width="14" />
+      <!-- Inner Embossed Diamond Star on Medallion -->
+      <polygon points="256,196 274,238 316,256 274,274 256,316 238,274 196,256 238,238"
+               fill="#FFF9C4" stroke="#2B1105" stroke-width="8" stroke-linejoin="round" />
+      <!-- Center Glossy Gold Nectar Cabochon -->
+      <circle cx="256" cy="256" r="30" fill="url(#blossom-nectar-core)" stroke="#2B1105" stroke-width="10" />
+    </g>
+  </g>
+
+  <!-- CALQUE 4 : HARD-EDGED SPECULAR HIGHLIGHTS (CANDY GLAZE) -->
+  <g id="specular-highlights">
+    <!-- Top Petal Thick Candy Glaze Arc -->
+    <path d="M 212 128 C 212 88 232 68 256 68 C 272 68 286 78 292 98 C 278 88 264 84 250 88 C 232 92 222 108 218 132 Z"
+          fill="#FFFFFF" opacity="0.95" />
+    <circle cx="215" cy="148" r="8" fill="#FFFFFF" opacity="0.92" />
+
+    <!-- Left Petal Thick Candy Glaze Arc -->
+    <path d="M 132 212 C 92 212 70 230 70 254 C 70 268 78 280 94 286 C 86 272 84 258 90 244 C 96 230 112 222 136 218 Z"
+          fill="#FFFFFF" opacity="0.95" />
+    <circle cx="152" cy="215" r="7.5" fill="#FFFFFF" opacity="0.92" />
+
+    <!-- Right Petal Rim Glaze Highlight -->
+    <path d="M 356 202 C 392 196 424 210 432 236"
+          fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" opacity="0.88" />
+
+    <!-- Bottom Petal Rim Glaze Highlight -->
+    <path d="M 214 368 C 212 396 224 420 244 430"
+          fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round" opacity="0.82" />
+
+    <!-- Central Nectar Cabochon Specular Bean -->
+    <ellipse cx="245" cy="245" rx="10" ry="6" transform="rotate(-35 245 245)" fill="#FFFFFF" />
+    <circle cx="236" cy="256" r="3.5" fill="#FFFFFF" />
+
+    <!-- Diagonal Ray Specular Glints -->
+    <circle cx="91" cy="91" r="4.5" fill="#FFFFFF" />
+    <circle cx="411" cy="91" r="4.5" fill="#FFFFFF" />
+
+    <!-- Floating Sugar Sparkles -->
+    <path d="M 152 64 L 157 78 L 171 83 L 157 88 L 152 102 L 147 88 L 133 83 L 147 78 Z"
+          fill="#FFFFFF" stroke="#2B1105" stroke-width="5" stroke-linejoin="round" />
+    <path d="M 372 68 L 376 80 L 388 84 L 376 88 L 372 100 L 368 88 L 356 84 L 368 80 Z"
+          fill="#FFF59D" stroke="#2B1105" stroke-width="5" stroke-linejoin="round" />
+  </g>
+</svg>

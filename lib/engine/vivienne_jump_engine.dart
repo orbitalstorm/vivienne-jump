@@ -510,10 +510,18 @@ class VivienneJumpEngine extends ChangeNotifier {
     }
 
     final double cullBottomY = cameraY + worldHeight + 160.0;
-    platforms.removeWhere((LvPlatform p) => p.y > cullBottomY);
+    platforms.removeWhere(isPlatformBelowScreen);
     collectibles.removeWhere((BlossomCollectible c) => c.y > cullBottomY);
     hazards.removeWhere((LvAtelierHazard h) => h.y > cullBottomY);
     notifyListeners();
+  }
+
+  /// Returns `true` as soon as `plat` exits the bottom of the visible screen (`cameraY + worldHeight`).
+  /// Once a platform exits the bottom of the screen, it disappears and cannot be bounced on.
+  bool isPlatformBelowScreen(LvPlatform plat) {
+    final double screenBottomY = cameraY + worldHeight;
+    return plat.y >= screenBottomY ||
+        (plat.y - plat.height * 0.5) >= screenBottomY;
   }
 
   /// Resets and starts a fresh deterministic ascent run from `seed`.
@@ -717,9 +725,12 @@ class VivienneJumpEngine extends ChangeNotifier {
       }
     }
 
+    // Immediately discard any platform that has already exited the bottom of the screen
+    platforms.removeWhere(isPlatformBelowScreen);
+
     if (playerVy >= 0.0) {
       for (final LvPlatform plat in platforms) {
-        if (plat.broken) continue;
+        if (plat.broken || isPlatformBelowScreen(plat)) continue;
         final double platTop = plat.y - plat.height * 0.5;
         final bool crossedTop =
             prevBottomY <= platTop + 12.0 && newBottomY >= platTop - 4.0;
@@ -832,20 +843,29 @@ class VivienneJumpEngine extends ChangeNotifier {
     // 8. Deterministically generate new platforms above the camera using `_levelRng`
     _populatePlatformsUpTo(cameraY - worldHeight * 1.15);
 
-    // 9. Cull entities far below the camera
+    // 9. Immediately make platforms disappear as soon as they exit the bottom of the screen
+    platforms.removeWhere(isPlatformBelowScreen);
     final double cullBottomY = cameraY + worldHeight + 150.0;
-    platforms.removeWhere((LvPlatform p) => p.y > cullBottomY);
     collectibles.removeWhere(
       (BlossomCollectible c) => c.collected || c.y > cullBottomY,
     );
     hazards.removeWhere((LvAtelierHazard h) => h.y > cullBottomY);
 
-    // 10. Update particles & floating callouts
+    // 10. Update particles with platform-specific physics (drag, swirl, gravityScale) & callouts
     for (final BlossomParticle p in particles) {
-      p.x += p.vx * step;
+      if (p.drag > 0.0) {
+        final double damping = math.max(0.0, 1.0 - p.drag * step);
+        p.vx *= damping;
+        p.vy *= damping;
+      }
+      p.swirlPhase += p.swirlFrequency * step;
+      final double swirlVx = p.swirlAmplitude != 0.0
+          ? math.cos(p.swirlPhase) * p.swirlAmplitude
+          : 0.0;
+      p.x += (p.vx + swirlVx) * step;
       p.y += p.vy * step;
-      p.vy += 180.0 * step;
-      p.rotation += 2.5 * step;
+      p.vy += (gravity * 0.24 * p.gravityScale) * step;
+      p.rotation += 3.2 * step;
       p.life -= step;
     }
     particles.removeWhere((BlossomParticle p) => p.life <= 0.0);
@@ -895,6 +915,11 @@ class VivienneJumpEngine extends ChangeNotifier {
         selectedEdition.jumpImpulseMultiplier;
     playerVy = impulse;
 
+    final double impactX = playerX.clamp(
+      plat.x - plat.width * 0.44,
+      plat.x + plat.width * 0.44,
+    );
+
     // Perfect Center Bounce detection: landing within 24% of platform center
     final bool isPerfectCenter =
         (playerX - plat.x).abs() <= plat.width * 0.24;
@@ -921,7 +946,7 @@ class VivienneJumpEngine extends ChangeNotifier {
       perfectBounceStreak = 0;
     }
 
-    // Distinct, crystal-clear gameplay effects & visual feedback per platform type
+    // Gameplay effects + lightweight, dynamic per-platform particle physics (no verbose platform callouts)
     switch (plat.type) {
       case LvPlatformType.springLockGold:
         plat.hasSpringTriggered = true;
@@ -930,15 +955,7 @@ class VivienneJumpEngine extends ChangeNotifier {
         if (score > bestScore) {
           bestScore = score;
         }
-        callouts.add(
-          FloatingCallout(
-            text: 'SUPER RESSORT ×1.45 !',
-            x: plat.x,
-            y: plat.y - 20.0,
-            color: const Color(0xFFFFD700),
-          ),
-        );
-        _spawnCelebrationBurst(plat.x, plat.y, 16);
+        _spawnPlatformBounceParticles(plat, impactX: impactX);
 
       case LvPlatformType.silkBlossomFragile:
         plat.broken = true;
@@ -946,15 +963,7 @@ class VivienneJumpEngine extends ChangeNotifier {
         if (score > bestScore) {
           bestScore = score;
         }
-        callouts.add(
-          FloatingCallout(
-            text: 'ÉPHÉMÈRE 1× !',
-            x: plat.x,
-            y: plat.y - 20.0,
-            color: const Color(0xFFF48FB1),
-          ),
-        );
-        _spawnFragileShatterBurst(plat.x, plat.y, 14);
+        _spawnPlatformBounceParticles(plat, impactX: impactX);
 
       case LvPlatformType.damierCloud:
         blossomGauge = (blossomGauge + 0.12).clamp(0.0, 1.0);
@@ -962,33 +971,17 @@ class VivienneJumpEngine extends ChangeNotifier {
         if (score > bestScore) {
           bestScore = score;
         }
-        callouts.add(
-          FloatingCallout(
-            text: 'SAUT AMORTI ×0.85 • ÉCLAT +12%',
-            x: plat.x,
-            y: plat.y - 20.0,
-            color: const Color(0xFF80D8FF),
-          ),
-        );
-        _spawnCelebrationBurst(plat.x, plat.y, 7);
+        _spawnPlatformBounceParticles(plat, impactX: impactX);
 
       case LvPlatformType.vachettaStrapMoving:
         score += (45 * comboCount * selectedEdition.scoreMultiplier).round();
         if (score > bestScore) {
           bestScore = score;
         }
-        callouts.add(
-          FloatingCallout(
-            text: 'RAIL MOBILE ×1.14',
-            x: plat.x,
-            y: plat.y - 20.0,
-            color: const Color(0xFFE3A17B),
-          ),
-        );
-        _spawnCelebrationBurst(plat.x, plat.y, 7);
+        _spawnPlatformBounceParticles(plat, impactX: impactX);
 
       case LvPlatformType.monogramTrunk:
-        _spawnCelebrationBurst(plat.x, plat.y, 5);
+        _spawnPlatformBounceParticles(plat, impactX: impactX);
     }
   }
 
@@ -1264,30 +1257,176 @@ class VivienneJumpEngine extends ChangeNotifier {
     return BlossomItemType.speedyBagBoost;
   }
 
-  void _spawnFragileShatterBurst(double cx, double cy, int count) {
-    const List<Color> petalPalette = <Color>[
-      Color(0xFFF48FB1),
-      Color(0xFFF8BBD0),
-      Color(0xFFFFF0F5),
-      Color(0xFFFFD700),
-    ];
-    for (int i = 0; i < count; i++) {
-      final double angle = (i / count) * math.pi * 2.0 + _fxRng.nextDouble() * 0.35;
-      final double speed = 60.0 + _fxRng.nextDouble() * 140.0;
-      particles.add(
-        BlossomParticle(
-          x: cx + (_fxRng.nextDouble() - 0.5) * 36.0,
-          y: cy,
-          vx: math.cos(angle) * speed,
-          vy: math.sin(angle) * speed - 35.0,
-          size: 5.5 + _fxRng.nextDouble() * 4.5,
-          color: petalPalette[i % petalPalette.length],
-          life: 0.55 + _fxRng.nextDouble() * 0.30,
-          maxLife: 0.85,
-          isPetal: true,
-          rotation: _fxRng.nextDouble() * math.pi,
-        ),
-      );
+  /// Spawns a lightweight, dynamic particle burst at `impactX` whose physics
+  /// (`gravityScale`, `drag`, `swirlAmplitude`, `stretchFactor`, `shape`) are
+  /// specifically tailored to the platform's physical archetype.
+  void _spawnPlatformBounceParticles(
+    LvPlatform plat, {
+    required double impactX,
+  }) {
+    final double topY = plat.y - plat.height * 0.5;
+    switch (plat.type) {
+      case LvPlatformType.monogramTrunk:
+        // 1. Malle Monogram Ébène: Crisp brass/gold sparks fanning out with heavy parabolic gravity
+        const List<Color> sparkColors = <Color>[
+          Color(0xFFFFD700),
+          Color(0xFFFFE082),
+          Color(0xFFE3A17B),
+        ];
+        for (int i = 0; i < 8; i++) {
+          final double side = i.isEven ? 1.0 : -1.0;
+          final double vx = side * (62.0 + _fxRng.nextDouble() * 68.0);
+          final double vy = -(65.0 + _fxRng.nextDouble() * 60.0);
+          final double life = 0.34 + _fxRng.nextDouble() * 0.14;
+          particles.add(
+            BlossomParticle(
+              x: impactX + (_fxRng.nextDouble() - 0.5) * 18.0,
+              y: topY,
+              vx: vx,
+              vy: vy,
+              size: 4.2 + _fxRng.nextDouble() * 2.6,
+              color: sparkColors[i % sparkColors.length],
+              life: life,
+              maxLife: life,
+              shape: PlatformParticleShape.brassSpark,
+              gravityScale: 1.25,
+              drag: 1.8,
+              rotation: _fxRng.nextDouble() * math.pi,
+            ),
+          );
+        }
+
+      case LvPlatformType.springLockGold:
+        // 2. Malle Ressort Or 24K: High-velocity ascending 24K gold stars with upward anti-gravity jet
+        const List<Color> springColors = <Color>[
+          Color(0xFFFFD700),
+          Color(0xFFFFF59D),
+          Color(0xFFFFFFFF),
+          Color(0xFFFFA000),
+        ];
+        for (int i = 0; i < 12; i++) {
+          final double vx = (_fxRng.nextDouble() - 0.5) * 84.0;
+          final double vy = -(185.0 + _fxRng.nextDouble() * 125.0);
+          final double life = 0.42 + _fxRng.nextDouble() * 0.16;
+          particles.add(
+            BlossomParticle(
+              x: impactX + (_fxRng.nextDouble() - 0.5) * 28.0,
+              y: topY - 4.0,
+              vx: vx,
+              vy: vy,
+              size: 5.5 + _fxRng.nextDouble() * 3.5,
+              color: springColors[i % springColors.length],
+              life: life,
+              maxLife: life,
+              shape: PlatformParticleShape.springUpdraftStar,
+              gravityScale: -0.35,
+              drag: 0.8,
+              swirlAmplitude: 22.0,
+              swirlFrequency: 10.5,
+              swirlPhase: _fxRng.nextDouble() * math.pi * 2.0,
+              stretchFactor: 1.65,
+              rotation: _fxRng.nextDouble() * math.pi,
+            ),
+          );
+        }
+
+      case LvPlatformType.damierCloud:
+        // 3. Nuage Damier Amorti: Cushioned cloud puffs expanding outward with strong viscous drag & buoyant float
+        const List<Color> cloudColors = <Color>[
+          Color(0xFFFFFFFF),
+          Color(0xFFE1F5FE),
+          Color(0xFF80D8FF),
+        ];
+        for (int i = 0; i < 10; i++) {
+          final double side = i.isEven ? 1.0 : -1.0;
+          final double vx = side * (55.0 + _fxRng.nextDouble() * 75.0);
+          final double vy = 8.0 + _fxRng.nextDouble() * 36.0;
+          final double life = 0.44 + _fxRng.nextDouble() * 0.16;
+          particles.add(
+            BlossomParticle(
+              x: impactX + (_fxRng.nextDouble() - 0.5) * 24.0,
+              y: plat.y,
+              vx: vx,
+              vy: vy,
+              size: 6.5 + _fxRng.nextDouble() * 4.0,
+              color: cloudColors[i % cloudColors.length],
+              life: life,
+              maxLife: life,
+              shape: PlatformParticleShape.cloudCushionPuff,
+              gravityScale: -0.20,
+              drag: 5.2,
+              rotation: _fxRng.nextDouble() * math.pi,
+            ),
+          );
+        }
+
+      case LvPlatformType.silkBlossomFragile:
+        // 4. Pétale de Soie Éphémère: Fluttering silk petals with feather-light gravity & sinusoidal sway
+        const List<Color> petalPalette = <Color>[
+          Color(0xFFF48FB1),
+          Color(0xFFF8BBD0),
+          Color(0xFFFFF0F5),
+          Color(0xFFFFD700),
+        ];
+        for (int i = 0; i < 12; i++) {
+          final double angle =
+              (i / 12.0) * math.pi * 2.0 + _fxRng.nextDouble() * 0.35;
+          final double speed = 48.0 + _fxRng.nextDouble() * 78.0;
+          final double life = 0.50 + _fxRng.nextDouble() * 0.18;
+          particles.add(
+            BlossomParticle(
+              x: plat.x + (_fxRng.nextDouble() - 0.5) * 34.0,
+              y: plat.y,
+              vx: math.cos(angle) * speed,
+              vy: math.sin(angle) * speed * 0.55 - 24.0,
+              size: 5.5 + _fxRng.nextDouble() * 3.8,
+              color: petalPalette[i % petalPalette.length],
+              life: life,
+              maxLife: life,
+              isPetal: true,
+              shape: PlatformParticleShape.silkPetalFlutter,
+              gravityScale: 0.28,
+              drag: 1.4,
+              swirlAmplitude: 62.0,
+              swirlFrequency: 8.8,
+              swirlPhase: _fxRng.nextDouble() * math.pi * 2.0,
+              rotation: _fxRng.nextDouble() * math.pi,
+            ),
+          );
+        }
+
+      case LvPlatformType.vachettaStrapMoving:
+        // 5. Lanière Cuir Vachetta Mobile: Sleek directional velocity streaks coupled to rail momentum
+        const List<Color> strapColors = <Color>[
+          Color(0xFFE3A17B),
+          Color(0xFFFFD700),
+          Color(0xFF8B1E24),
+        ];
+        final double railSlipVx =
+            plat.vx.abs() > 1.0 ? -plat.vx * 1.35 : 75.0;
+        for (int i = 0; i < 9; i++) {
+          final double vx =
+              railSlipVx + (_fxRng.nextDouble() - 0.5) * 90.0;
+          final double vy = -(52.0 + _fxRng.nextDouble() * 58.0);
+          final double life = 0.32 + _fxRng.nextDouble() * 0.14;
+          particles.add(
+            BlossomParticle(
+              x: impactX + (_fxRng.nextDouble() - 0.5) * 22.0,
+              y: topY,
+              vx: vx,
+              vy: vy,
+              size: 4.6 + _fxRng.nextDouble() * 2.8,
+              color: strapColors[i % strapColors.length],
+              life: life,
+              maxLife: life,
+              shape: PlatformParticleShape.kineticStrapTrail,
+              gravityScale: 0.65,
+              drag: 2.2,
+              stretchFactor: 1.90,
+              rotation: math.atan2(vy, vx),
+            ),
+          );
+        }
     }
   }
 

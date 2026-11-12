@@ -1,0 +1,214 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Imperial Gold Multi-Planar Gradients -->
+    <linearGradient id="crown-gold-main" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDE7" />
+      <stop offset="28%" stop-color="#FFE082" />
+      <stop offset="62%" stop-color="#FFB300" />
+      <stop offset="100%" stop-color="#E65100" />
+    </linearGradient>
+
+    <linearGradient id="crown-gold-band" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFA000" />
+      <stop offset="25%" stop-color="#FFF59D" />
+      <stop offset="55%" stop-color="#FFC107" />
+      <stop offset="85%" stop-color="#FF8F00" />
+      <stop offset="100%" stop-color="#B25900" />
+    </linearGradient>
+
+    <!-- Royal Velvet Cushion Gradient -->
+    <radialGradient id="crown-velvet" cx="45%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#FF5252" />
+      <stop offset="48%" stop-color="#D50000" />
+      <stop offset="85%" stop-color="#880E4F" />
+      <stop offset="100%" stop-color="#4A001F" />
+    </radialGradient>
+
+    <!-- Jewel Gradients: Ruby & Emerald & Blossom Pearl -->
+    <radialGradient id="crown-ruby" cx="35%" cy="30%" r="68%">
+      <stop offset="0%" stop-color="#FFCDD2" />
+      <stop offset="35%" stop-color="#FF1744" />
+      <stop offset="80%" stop-color="#B71C1C" />
+      <stop offset="100%" stop-color="#4A0000" />
+    </radialGradient>
+
+    <radialGradient id="crown-emerald" cx="35%" cy="30%" r="68%">
+      <stop offset="0%" stop-color="#E0F2F1" />
+      <stop offset="35%" stop-color="#00E676" />
+      <stop offset="78%" stop-color="#00897B" />
+      <stop offset="100%" stop-color="#00332C" />
+    </radialGradient>
+
+    <radialGradient id="crown-blossom-petal" cx="40%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="50%" stop-color="#FFF59D" />
+      <stop offset="100%" stop-color="#FFB300" />
+    </radialGradient>
+
+    <clipPath id="crown-spike-clip">
+      <path d="M 92 368 L 56 176 L 166 254 L 256 112 L 346 254 L 456 176 L 420 368 Z" />
+    </clipPath>
+  </defs>
+
+  <!-- CALQUE 1 : BASE SHADOW & SILHOUETTE OFFSET -->
+  <g id="base-shadow">
+    <!-- Ground Contact Shadow -->
+    <ellipse cx="256" cy="454" rx="182" ry="26" fill="#2B1105" opacity="0.28" />
+    <ellipse cx="256" cy="452" rx="144" ry="16" fill="#2B1105" opacity="0.42" />
+
+    <!-- Cartoon Sticker Offset Silhouette -->
+    <path d="M 56 154 C 74 154 88 168 88 186 L 164 242 L 238 116 C 234 102 242 84 256 84 C 270 84 278 102 274 116 L 348 242 L 424 186 C 424 168 438 154 456 154 C 474 154 486 170 482 188 L 436 376 C 446 382 452 394 452 408 L 452 424 C 452 442 436 454 418 454 L 94 454 C 76 454 60 442 60 424 L 60 408 C 60 394 66 382 76 376 L 30 188 C 26 170 38 154 56 154 Z"
+          fill="#2B1105" transform="translate(0, 10)" opacity="0.34" />
+  </g>
+
+  <!-- CALQUE 2 & 3 : MAIN BODY, SUB-ASSEMBLIES & MICRO-DETAILS -->
+  <g id="main-body">
+    <!-- Royal Velvet Padded Cap (Coiffe de Velours Impérial) -->
+    <g id="velvet-cushion">
+      <!-- Left Velvet Lobe -->
+      <path d="M 96 340 C 78 232 132 152 214 164 C 242 168 256 196 256 230 L 256 350 Z"
+            fill="url(#crown-velvet)" stroke="#2B1105" stroke-width="14" stroke-linejoin="round" />
+      <!-- Right Velvet Lobe -->
+      <path d="M 416 340 C 434 232 380 152 298 164 C 270 168 256 196 256 230 L 256 350 Z"
+            fill="url(#crown-velvet)" stroke="#2B1105" stroke-width="14" stroke-linejoin="round" />
+      <!-- Velvet Quilted Seam & Gold Piping -->
+      <path d="M 156 172 Q 198 238 190 330" fill="none" stroke="#6A001D" stroke-width="8" stroke-linecap="round" />
+      <path d="M 356 172 Q 314 238 322 330" fill="none" stroke="#6A001D" stroke-width="8" stroke-linecap="round" />
+      <!-- Rear Spike Finial Orbs peeking behind Velvet -->
+      <circle cx="164" cy="158" r="18" fill="url(#crown-gold-main)" stroke="#2B1105" stroke-width="11" />
+      <circle cx="348" cy="158" r="18" fill="url(#crown-gold-main)" stroke="#2B1105" stroke-width="11" />
+    </g>
+
+    <!-- Golden Crown Spikes & Arches (Pointes Royales Multi-Plans) -->
+    <g id="crown-frame">
+      <path d="M 92 368 L 56 176 L 166 254 L 256 112 L 346 254 L 456 176 L 420 368 Z"
+            fill="url(#crown-gold-main)" />
+
+      <!-- Multi-planar Cel-Shaded Facets inside Crown Frame -->
+      <g clip-path="url(#crown-spike-clip)">
+        <!-- Left Sunlit Facets -->
+        <polygon points="56,176 116,218 118,368 92,368" fill="#FFF9C4" opacity="0.6" />
+        <polygon points="256,112 204,200 212,368 256,368" fill="#FFF59D" opacity="0.52" />
+        <!-- Right Shadowed Gold Facets -->
+        <polygon points="256,112 310,200 300,368 256,368" fill="#E65100" opacity="0.38" />
+        <polygon points="456,176 382,228 370,368 420,368" fill="#B25900" opacity="0.58" />
+        <!-- Inner Bevel Border Line -->
+        <path d="M 108 352 L 80 206 L 168 268 L 256 138 L 344 268 L 432 206 L 404 352"
+              fill="none" stroke="#FFF9C4" stroke-width="6" stroke-linejoin="round" opacity="0.8" />
+      </g>
+
+      <!-- Crown Spikes Heavy Outer Contour -->
+      <path d="M 92 368 L 56 176 L 166 254 L 256 112 L 346 254 L 456 176 L 420 368 Z"
+            fill="none" stroke="#2B1105" stroke-width="15" stroke-linejoin="round" />
+
+      <!-- Three Primary Golden Finial Orbs (Perles d'Or au Sommet) -->
+      <circle cx="54" cy="168" r="24" fill="url(#crown-gold-main)" stroke="#2B1105" stroke-width="13" />
+      <circle cx="458" cy="168" r="24" fill="url(#crown-gold-main)" stroke="#2B1105" stroke-width="13" />
+      <circle cx="256" cy="96" r="28" fill="url(#crown-gold-main)" stroke="#2B1105" stroke-width="14" />
+    </g>
+
+    <!-- Jeweled Circlet Headband (Bandeau Sertissage & Moulures) -->
+    <g id="crown-circlet">
+      <!-- Main Lower Circlet Base -->
+      <rect x="70" y="356" width="372" height="82" rx="26"
+            fill="url(#crown-gold-band)" stroke="#2B1105" stroke-width="15" stroke-linejoin="round" />
+      <!-- Bottom Occlusion Strip -->
+      <path d="M 84 414 L 428 414 C 428 426 418 430 404 430 L 108 430 C 94 430 84 426 84 414 Z"
+            fill="#8D3200" opacity="0.55" />
+      <!-- Upper Rope Molding Trim -->
+      <rect x="78" y="346" width="356" height="22" rx="11"
+            fill="url(#crown-gold-main)" stroke="#2B1105" stroke-width="11" />
+      <!-- Lower Rope Molding Trim -->
+      <rect x="82" y="424" width="348" height="20" rx="10"
+            fill="url(#crown-gold-main)" stroke="#2B1105" stroke-width="11" />
+
+      <!-- Circlet Jewels & Gold Bezels -->
+      <!-- Center Ruby Cushion Jewel -->
+      <rect x="228" y="374" width="56" height="42" rx="14"
+            fill="url(#crown-ruby)" stroke="#2B1105" stroke-width="10" />
+      <rect x="238" y="383" width="36" height="24" rx="6"
+            fill="none" stroke="#FFCDD2" stroke-width="3" opacity="0.75" />
+
+      <!-- Left & Right Emerald Octagonal Jewels -->
+      <polygon points="140,376 172,376 182,388 182,402 172,414 140,414 130,402 130,388"
+               fill="url(#crown-emerald)" stroke="#2B1105" stroke-width="10" stroke-linejoin="round" />
+      <polygon points="340,376 372,376 382,388 382,402 372,414 340,414 330,402 330,388"
+               fill="url(#crown-emerald)" stroke="#2B1105" stroke-width="10" stroke-linejoin="round" />
+
+      <!-- Golden Rivet Studs between Gems -->
+      <circle cx="204" cy="395" r="7" fill="#FFF59D" stroke="#2B1105" stroke-width="5" />
+      <circle cx="308" cy="395" r="7" fill="#FFF59D" stroke="#2B1105" stroke-width="5" />
+      <circle cx="104" cy="395" r="6" fill="#FFF59D" stroke="#2B1105" stroke-width="5" />
+      <circle cx="408" cy="395" r="6" fill="#FFF59D" stroke="#2B1105" stroke-width="5" />
+    </g>
+
+    <!-- Central Monogram Quatrefoil Flower & Side Rubies on Crown Body -->
+    <g id="crown-emblems">
+      <!-- Left Side Ruby Cabochon -->
+      <ellipse cx="132" cy="296" rx="20" ry="26" transform="rotate(-14 132 296)"
+               fill="url(#crown-ruby)" stroke="#2B1105" stroke-width="10" />
+      <!-- Right Side Ruby Cabochon -->
+      <ellipse cx="380" cy="296" rx="20" ry="26" transform="rotate(14 380 296)"
+               fill="url(#crown-ruby)" stroke="#2B1105" stroke-width="10" />
+
+      <!-- Central Monogram 4-Petal Blossom Crest -->
+      <g id="monogram-crest" transform="translate(256, 268)">
+        <!-- Drop Shadow -->
+        <path d="M 0 -54 C 18 -34 18 -14 0 0 C 14 -18 34 -18 54 0 C 34 18 14 18 0 0 C 18 14 18 34 0 54 C -18 34 -18 14 0 0 C -14 18 -34 18 -54 0 C -34 -18 -14 -18 0 0 C -18 -14 -18 -34 0 -54 Z"
+              fill="#8D3200" transform="translate(0, 6) scale(1.08)" opacity="0.55" />
+        <!-- Diamond Gold Backing Plate -->
+        <polygon points="0,-58 58,0 0,58 -58,0"
+                 fill="url(#crown-emerald)" stroke="#2B1105" stroke-width="11" stroke-linejoin="round" />
+        <!-- 4 Pointed Monogram Petals -->
+        <path d="M 0 -46 C 16 -26 16 -8 0 0 C -16 -8 -16 -26 0 -46 Z"
+              fill="url(#crown-blossom-petal)" stroke="#2B1105" stroke-width="8" stroke-linejoin="round" />
+        <path d="M 0 46 C 16 26 16 8 0 0 C -16 8 -16 26 0 46 Z"
+              fill="url(#crown-blossom-petal)" stroke="#2B1105" stroke-width="8" stroke-linejoin="round" />
+        <path d="M -46 0 C -26 -16 -8 -16 0 0 C -8 16 -26 16 -46 0 Z"
+              fill="url(#crown-blossom-petal)" stroke="#2B1105" stroke-width="8" stroke-linejoin="round" />
+        <path d="M 46 0 C 26 -16 8 -16 0 0 C 8 16 26 16 46 0 Z"
+              fill="url(#crown-blossom-petal)" stroke="#2B1105" stroke-width="8" stroke-linejoin="round" />
+        <!-- Center Ruby Core -->
+        <circle cx="0" cy="0" r="12" fill="url(#crown-ruby)" stroke="#2B1105" stroke-width="7" />
+      </g>
+    </g>
+  </g>
+
+  <!-- CALQUE 4 : HARD-EDGED SPECULAR HIGHLIGHTS -->
+  <g id="specular-highlights">
+    <!-- Velvet Cushion Gloss Highlights -->
+    <path d="M 118 228 C 126 196 154 176 184 178"
+          fill="none" stroke="#FF8A80" stroke-width="10" stroke-linecap="round" opacity="0.65" />
+    <path d="M 276 184 C 292 174 316 174 334 186"
+          fill="none" stroke="#FF8A80" stroke-width="8" stroke-linecap="round" opacity="0.55" />
+
+    <!-- Finial Orb Specular Crescents -->
+    <circle cx="246" cy="86" r="9" fill="#FFFFFF" />
+    <circle cx="46" cy="160" r="7.5" fill="#FFFFFF" />
+    <circle cx="450" cy="160" r="7.5" fill="#FFFFFF" />
+    <circle cx="158" cy="152" r="5" fill="#FFFFFF" />
+    <circle cx="342" cy="152" r="5" fill="#FFFFFF" />
+
+    <!-- Crown Spike Left Edge Specular Streaks -->
+    <line x1="76" y1="218" x2="94" y2="318" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.9" />
+    <line x1="236" y1="158" x2="212" y2="202" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.92" />
+
+    <!-- Circlet Band Crisp Highlights -->
+    <line x1="104" y1="355" x2="220" y2="355" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" opacity="0.9" />
+    <line x1="108" y1="432" x2="188" y2="432" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" opacity="0.85" />
+
+    <!-- Jewel Facet Glints -->
+    <circle cx="244" cy="386" r="5.5" fill="#FFFFFF" />
+    <circle cx="146" cy="388" r="5" fill="#FFFFFF" />
+    <circle cx="346" cy="388" r="5" fill="#FFFFFF" />
+    <circle cx="126" cy="286" r="5" fill="#FFFFFF" />
+    <circle cx="374" cy="286" r="5" fill="#FFFFFF" />
+    <circle cx="252" cy="264" r="4" fill="#FFFFFF" />
+
+    <!-- Royal Sparkle Stars -->
+    <path d="M 142 82 L 148 98 L 164 104 L 148 110 L 142 126 L 136 110 L 120 104 L 136 98 Z"
+          fill="#FFFFFF" stroke="#2B1105" stroke-width="5" stroke-linejoin="round" />
+    <path d="M 382 88 L 387 100 L 399 105 L 387 110 L 382 122 L 377 110 L 365 105 L 377 100 Z"
+          fill="#FFF59D" stroke="#2B1105" stroke-width="5" stroke-linejoin="round" />
+  </g>
+</svg>

@@ -1,0 +1,166 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Isometric 3D Studio Cube Face Gradients -->
+    <!-- Top Face: Zenith Cyan-Gold Light -->
+    <linearGradient id="cube-top-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E0F7FA" />
+      <stop offset="45%" stop-color="#40C4FF" />
+      <stop offset="100%" stop-color="#0091EA" />
+    </linearGradient>
+
+    <!-- Left Face: Key Light Azure -->
+    <linearGradient id="cube-left-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#29B6F6" />
+      <stop offset="55%" stop-color="#0277BD" />
+      <stop offset="100%" stop-color="#003C8F" />
+    </linearGradient>
+
+    <!-- Right Face: Studio Rim Violet-Indigo -->
+    <linearGradient id="cube-right-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C4DFF" />
+      <stop offset="55%" stop-color="#512DA8" />
+      <stop offset="100%" stop-color="#1A0066" />
+    </linearGradient>
+
+    <!-- Luminous Chamfer Bevel Gradients -->
+    <linearGradient id="cube-bevel-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="50%" stop-color="#84FFFF" />
+      <stop offset="100%" stop-color="#40C4FF" />
+    </linearGradient>
+
+    <linearGradient id="cube-gold-emblem" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFDE7" />
+      <stop offset="50%" stop-color="#FFD54F" />
+      <stop offset="100%" stop-color="#FF8F00" />
+    </linearGradient>
+  </defs>
+
+  <!-- CALQUE 1 : ISOMETRIC BASE SHADOW & SILHOUETTE OFFSET -->
+  <g id="base-shadow">
+    <!-- Isometric Hexagonal Ground Shadow -->
+    <polygon points="256,432 418,458 256,492 94,458"
+             fill="#2B1105" opacity="0.28" />
+    <polygon points="256,442 378,460 256,482 134,460"
+             fill="#2B1105" opacity="0.42" />
+
+    <!-- Cartoon Sticker Offset Silhouette -->
+    <polygon points="256,52 442,156 442,364 256,468 70,364 70,156"
+             fill="#2B1105" transform="translate(0, 12)" opacity="0.34"
+             stroke="#2B1105" stroke-width="18" stroke-linejoin="round" />
+  </g>
+
+  <!-- CALQUE 2 & 3 : MAIN BODY, BEVELED CHAMFERS & MICRO-DETAILS -->
+  <g id="main-body">
+    <!-- Three Primary Isometric Faces -->
+    <!-- Top Face (Plan Supérieur) -->
+    <polygon points="256,54 438,156 256,258 74,156"
+             fill="url(#cube-top-grad)" stroke="#2B1105" stroke-width="14" stroke-linejoin="round" />
+
+    <!-- Left Face (Plan Latéral Gauche) -->
+    <polygon points="74,156 256,258 256,464 74,362"
+             fill="url(#cube-left-grad)" stroke="#2B1105" stroke-width="14" stroke-linejoin="round" />
+
+    <!-- Right Face (Plan Latéral Droit) -->
+    <polygon points="256,258 438,156 438,362 256,464"
+             fill="url(#cube-right-grad)" stroke="#2B1105" stroke-width="14" stroke-linejoin="round" />
+
+    <!-- Luminous Chamfered Bevel Strips (Arêtes Biseautées Lumineuses) -->
+    <g id="luminous-chamfers">
+      <!-- Top-Left to Center Bevel Strip -->
+      <polygon points="74,156 92,146 256,238 256,258"
+               fill="url(#cube-bevel-glow)" opacity="0.88" />
+      <!-- Top-Right to Center Bevel Strip -->
+      <polygon points="438,156 420,146 256,238 256,258"
+               fill="#80D8FF" opacity="0.75" />
+      <!-- Center Vertical Spine Bevel Strip -->
+      <polygon points="244,252 256,258 268,252 268,456 256,464 244,456"
+               fill="url(#cube-bevel-glow)" opacity="0.82" />
+    </g>
+
+    <!-- Recessed Studio Panels & Technical Grid Micro-Details -->
+    <!-- Top Recessed Panel + Golden 4-Pointed Blossom Star -->
+    <g id="top-panel-details">
+      <polygon points="256,82 390,156 256,230 122,156"
+               fill="#0288D1" fill-opacity="0.32" stroke="#2B1105" stroke-width="8" stroke-linejoin="round" />
+      <!-- Isometric Wireframe Crosshair -->
+      <line x1="189" y1="119" x2="323" y2="193" stroke="#E0F7FA" stroke-width="4" opacity="0.55" />
+      <line x1="323" y1="119" x2="189" y2="193" stroke="#E0F7FA" stroke-width="4" opacity="0.55" />
+      <!-- Embossed Golden Monogram Star on Top Face -->
+      <polygon points="256,110 274,142 326,156 274,170 256,202 238,170 186,156 238,142"
+               fill="url(#cube-gold-emblem)" stroke="#2B1105" stroke-width="8" stroke-linejoin="round" />
+    </g>
+
+    <!-- Left Recessed Panel + Embossed Circle Emblem -->
+    <g id="left-panel-details">
+      <polygon points="102,198 228,268 228,418 102,348"
+               fill="#01579B" fill-opacity="0.52" stroke="#2B1105" stroke-width="8" stroke-linejoin="round" />
+      <!-- Isometric Grid Lines -->
+      <line x1="165" y1="233" x2="165" y2="383" stroke="#40C4FF" stroke-width="4" opacity="0.45" />
+      <line x1="102" y1="273" x2="228" y2="343" stroke="#40C4FF" stroke-width="4" opacity="0.45" />
+      <!-- Isometric Golden Ring Node -->
+      <ellipse cx="165" cy="308" rx="30" ry="42" transform="skewY(29)"
+               fill="none" />
+      <polygon points="165,264 198,282 198,350 165,332"
+               fill="url(#cube-gold-emblem)" stroke="#2B1105" stroke-width="8" stroke-linejoin="round" />
+    </g>
+
+    <!-- Right Recessed Panel + Embossed Diamond Emblem -->
+    <g id="right-panel-details">
+      <polygon points="284,268 410,198 410,348 284,418"
+               fill="#1A0066" fill-opacity="0.55" stroke="#2B1105" stroke-width="8" stroke-linejoin="round" />
+      <!-- Isometric Grid Lines -->
+      <line x1="347" y1="233" x2="347" y2="383" stroke="#B388FF" stroke-width="4" opacity="0.45" />
+      <line x1="284" y1="343" x2="410" y2="273" stroke="#B388FF" stroke-width="4" opacity="0.45" />
+      <!-- Isometric Golden Lozenge -->
+      <polygon points="347,258 384,288 347,358 310,328"
+               fill="url(#cube-gold-emblem)" stroke="#2B1105" stroke-width="8" stroke-linejoin="round" />
+    </g>
+
+    <!-- Re-draw Primary Structural Outlines for Crisp Hierarchy -->
+    <polygon points="256,54 438,156 438,362 256,464 74,362 74,156"
+             fill="none" stroke="#2B1105" stroke-width="16" stroke-linejoin="round" />
+    <polyline points="74,156 256,258 438,156"
+              fill="none" stroke="#2B1105" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" />
+    <line x1="256" y1="258" x2="256" y2="464"
+          stroke="#2B1105" stroke-width="14" stroke-linecap="round" />
+
+    <!-- Golden Corner Vertex Caps (Coins Rivetés Atelier 3D) -->
+    <circle cx="256" cy="258" r="16" fill="url(#cube-gold-emblem)" stroke="#2B1105" stroke-width="10" />
+    <circle cx="256" cy="56" r="12" fill="url(#cube-gold-emblem)" stroke="#2B1105" stroke-width="9" />
+    <circle cx="76" cy="156" r="12" fill="url(#cube-gold-emblem)" stroke="#2B1105" stroke-width="9" />
+    <circle cx="436" cy="156" r="12" fill="url(#cube-gold-emblem)" stroke="#2B1105" stroke-width="9" />
+    <circle cx="256" cy="462" r="12" fill="url(#cube-gold-emblem)" stroke="#2B1105" stroke-width="9" />
+  </g>
+
+  <!-- CALQUE 4 : HARD-EDGED SPECULAR HIGHLIGHTS -->
+  <g id="specular-highlights">
+    <!-- Central Y-Bevel Razor Specular Highlight -->
+    <line x1="104" y1="160" x2="232" y2="232"
+          stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" opacity="0.95" />
+    <line x1="280" y1="232" x2="408" y2="160"
+          stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" opacity="0.8" />
+    <line x1="244" y1="284" x2="244" y2="424"
+          stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" opacity="0.9" />
+
+    <!-- Top-Left Outer Edge Rim Specular -->
+    <line x1="102" y1="130" x2="226" y2="62"
+          stroke="#FFFFFF" stroke-width="7" stroke-linecap="round" opacity="0.9" />
+
+    <!-- Diagonal Glass Slash on Left Panel -->
+    <polygon points="114,224 142,240 114,296 114,264"
+             fill="#FFFFFF" opacity="0.55" />
+
+    <!-- Vertex Cap Glints -->
+    <circle cx="251" cy="253" r="5" fill="#FFFFFF" />
+    <circle cx="252" cy="52" r="3.5" fill="#FFFFFF" />
+    <circle cx="72" cy="152" r="3.5" fill="#FFFFFF" />
+    <circle cx="432" cy="152" r="3.5" fill="#FFFFFF" />
+
+    <!-- 3D Studio Sparkles -->
+    <path d="M 118 68 L 123 82 L 137 87 L 123 92 L 118 106 L 113 92 L 99 87 L 113 82 Z"
+          fill="#FFFFFF" stroke="#2B1105" stroke-width="5" stroke-linejoin="round" />
+    <path d="M 402 76 L 406 88 L 418 92 L 406 96 L 402 108 L 398 96 L 386 92 L 398 88 Z"
+          fill="#84FFFF" stroke="#2B1105" stroke-width="5" stroke-linejoin="round" />
+  </g>
+</svg>

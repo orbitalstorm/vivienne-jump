@@ -1,8 +1,8 @@
 name: vivienne_jump
-description: "VIVIENNE : L'Odyssée Blossom v1.2.0 — Jeu d'ascension verticale Haute Couture (Doodle Jump clone) en mode Portrait propulsé par l'asset Blender 3D vivienne_speedy_v03.blend, UI Store Mobile Pro, 5 plateformes différenciées et Tableau des Scores par Seed."
+description: "VIVIENNE : L'Odyssée Blossom v1.3.0 — Jeu d'ascension verticale Haute Couture (Doodle Jump clone) en mode Portrait propulsé par l'asset Blender 3D vivienne_speedy_v03.blend, UI Cartoon Pop (Angry Birds / Candy Crush), physique de particules par plateforme et disparition des plateformes hors écran."
 publish_to: 'none'
 
-version: 1.2.0+3
+version: 1.3.0+4
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -29,3 +29,7 @@ flutter:
     - assets/sprites/vivienne_pose_4_landing.png
     - assets/sprites/vivienne_pose_5_grand_apex.png
     - assets/sprites/vivienne_pose_6_rig.png
+    - assets/cartoon/cartoon_trophy_cup.svg
+    - assets/cartoon/cartoon_crown_edition.svg
+    - assets/cartoon/cartoon_blossom_star.svg
+    - assets/cartoon/cartoon_cube_3d.svg
